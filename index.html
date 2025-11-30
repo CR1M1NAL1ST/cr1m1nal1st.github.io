@@ -7,46 +7,22 @@
     <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
     <script src="https://unpkg.com/wavesurfer.js@7/dist/wavesurfer.min.js"></script>
     <style type="text/tailwindcss">
-      @theme {
-        --color-bg-main: #020617; /* фон */
-        --color-grid-fine: #0b1120; /* мелкие точки */
-        --color-grid-line: rgba(30, 64, 175, 0.55); /* диагональный крупный грид */
-      }
-
-      @layer base {
-        ::-webkit-scrollbar {
-          width: 0;
-          height: 0;
-        }::-webkit-scrollbar{width:0;}
+      @theme {--color-bg-main: #020617;--color-grid-fine: #0b1120;--color-grid-line: rgba(30, 64, 175, 0.55);}
+      @layer base {::-webkit-scrollbar {width: 0;height: 0;}
         html,
-        body {
-          margin: 0;
-          padding: 0;
-        }
-
+        body {margin: 0;padding: 0;}
         .bg-blueprint {
           background-color: var(--color-bg-main);
-          /*
-            Слои фона, от "глубокого" к верхнему:
-            1) мелкий точечный цифровой шум (16px сетка);
-            2) более крупные точки по центрам больших квадратов (≈110px);
-            3–4) исходный изометрический грид (диагонали 120° и 300°);
-            5–6) кратный ему комплиментарный wireframe-грид по осям X/Y.
-          */
           background-image:
-            /* мелкие точки */
             radial-gradient(circle at 1px 1px, var(--color-grid-fine) 1px, transparent 0),
-            /* крупные точки в центрах крупных квадратов */
             radial-gradient(circle at 50% 50%, rgba(148, 163, 184, 0.45) 2px, transparent 0),
-            /* изометрический диагональный грид */
             linear-gradient(120deg, var(--color-grid-line) 1px, transparent 0),
             linear-gradient(300deg, var(--color-grid-line) 1px, transparent 0),
-            /* ортогональный wireframe-грид */
             linear-gradient(0deg, rgba(148, 163, 184, 0.12) 1px, transparent 0),
             linear-gradient(90deg, rgba(148, 163, 184, 0.08) 1px, transparent 0);
           background-size:
-            16px 16px,   /* мелкая сетка точек */
-            110px 110px, /* крупные центральные точки */
+            16px 16px,
+            110px 110px,
             220px 220px,
             220px 220px,
             110px 110px,
@@ -59,14 +35,11 @@
             center center,
             center center;
         }
-
-        /* Шкалы-линейки для координат X и Y на холсте */
         .ruler-x {
           position: relative;
         }
 
         .ruler-x::before {
-          /* мелкие короткие штрихи */
           content: "";
           position: absolute;
           left: 0;
@@ -84,7 +57,6 @@
         }
 
         .ruler-x::after {
-          /* длинные штрихи на границах крупных квадратов, толщина та же, длина больше */
           content: "";
           position: absolute;
           left: 0;
@@ -101,12 +73,8 @@
             );
         }
 
-        .ruler-y {
-          position: relative;
-        }
-
+        .ruler-y {position: relative;}
         .ruler-y::before {
-          /* мелкие короткие штрихи */
           content: "";
           position: absolute;
           top: 0;
@@ -124,7 +92,6 @@
         }
 
         .ruler-y::after {
-          /* длинные штрихи на границах крупных квадратов, толщина та же, длина больше */
           content: "";
           position: absolute;
           top: 0;
@@ -821,7 +788,7 @@
 
           const defaultUrl =
             waveformEl.getAttribute('data-audio')?.trim() ||
-            'https://wavesurfer-js.org/example/media/demo.wav';
+            ' ';
 
           function loadSource(url) {
             const src = (url || '').trim();

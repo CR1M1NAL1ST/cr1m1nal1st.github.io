@@ -1,1 +1,1004 @@
+<!doctype html>
+<html lang="ru">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Tailwind 4 · BG + Aside + Canvas Rulers + WaveSurfer Player + URL Loader</title>
 
+    <!-- Tailwind CSS v4 CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <!-- WaveSurfer.js v7 -->
+    <script src="https://unpkg.com/wavesurfer.js@7/dist/wavesurfer.min.js"></script>
+
+    <style type="text/tailwindcss">
+      @theme {
+        --color-bg-main: #020617; /* фон */
+        --color-grid-fine: #0b1120; /* мелкие точки */
+        --color-grid-line: rgba(30, 64, 175, 0.55); /* диагональный крупный грид */
+      }
+
+      @layer base {
+        ::-webkit-scrollbar {
+          width: 0;
+          height: 0;
+        }
+
+        html,
+        body {
+          margin: 0;
+          padding: 0;
+        }
+
+        .bg-blueprint {
+          background-color: var(--color-bg-main);
+          /*
+            Слои фона, от "глубокого" к верхнему:
+            1) мелкий точечный цифровой шум (16px сетка);
+            2) более крупные точки по центрам больших квадратов (≈110px);
+            3–4) исходный изометрический грид (диагонали 120° и 300°);
+            5–6) кратный ему комплиментарный wireframe-грид по осям X/Y.
+          */
+          background-image:
+            /* мелкие точки */
+            radial-gradient(circle at 1px 1px, var(--color-grid-fine) 1px, transparent 0),
+            /* крупные точки в центрах крупных квадратов */
+            radial-gradient(circle at 50% 50%, rgba(148, 163, 184, 0.45) 2px, transparent 0),
+            /* изометрический диагональный грид */
+            linear-gradient(120deg, var(--color-grid-line) 1px, transparent 0),
+            linear-gradient(300deg, var(--color-grid-line) 1px, transparent 0),
+            /* ортогональный wireframe-грид */
+            linear-gradient(0deg, rgba(148, 163, 184, 0.12) 1px, transparent 0),
+            linear-gradient(90deg, rgba(148, 163, 184, 0.08) 1px, transparent 0);
+          background-size:
+            16px 16px,   /* мелкая сетка точек */
+            110px 110px, /* крупные центральные точки */
+            220px 220px,
+            220px 220px,
+            110px 110px,
+            110px 110px;
+          background-position:
+            0 0,
+            center center,
+            center center,
+            center center,
+            center center,
+            center center;
+        }
+
+        /* Шкалы-линейки для координат X и Y на холсте */
+        .ruler-x {
+          position: relative;
+        }
+
+        .ruler-x::before {
+          /* мелкие короткие штрихи */
+          content: "";
+          position: absolute;
+          left: 0;
+          right: 0;
+          bottom: 0;
+          height: 3px;
+          background-image:
+            repeating-linear-gradient(
+              to right,
+              rgba(148, 163, 184, 0.55) 0,
+              rgba(148, 163, 184, 0.55) 1px,
+              transparent 1px,
+              transparent 8px
+            );
+        }
+
+        .ruler-x::after {
+          /* длинные штрихи на границах крупных квадратов, толщина та же, длина больше */
+          content: "";
+          position: absolute;
+          left: 0;
+          right: 0;
+          bottom: 0;
+          height: 12px;
+          background-image:
+            repeating-linear-gradient(
+              to right,
+              rgba(148, 163, 184, 0.9) 0,
+              rgba(148, 163, 184, 0.9) 1px,
+              transparent 1px,
+              transparent 110px
+            );
+        }
+
+        .ruler-y {
+          position: relative;
+        }
+
+        .ruler-y::before {
+          /* мелкие короткие штрихи */
+          content: "";
+          position: absolute;
+          top: 0;
+          bottom: 0;
+          left: 0;
+          width: 3px;
+          background-image:
+            repeating-linear-gradient(
+              to bottom,
+              rgba(148, 163, 184, 0.55) 0,
+              rgba(148, 163, 184, 0.55) 1px,
+              transparent 1px,
+              transparent 8px
+            );
+        }
+
+        .ruler-y::after {
+          /* длинные штрихи на границах крупных квадратов, толщина та же, длина больше */
+          content: "";
+          position: absolute;
+          top: 0;
+          bottom: 0;
+          left: 0;
+          width: 12px;
+          background-image:
+            repeating-linear-gradient(
+              to bottom,
+              rgba(148, 163, 184, 0.9) 0,
+              rgba(148, 163, 184, 0.9) 1px,
+              transparent 1px,
+              transparent 110px
+            );
+        }
+
+        .grid-dot {
+          position: absolute;
+          width: 4px;
+          height: 4px;
+          border-radius: 9999px;
+          /* базовый цвет по умолчанию — hacker green, но может быть переопределён через --dot-color */
+          background: var(--dot-color, rgba(34, 197, 94, 0.95));
+          box-shadow:
+            0 0 4px var(--dot-color, rgba(34, 197, 94, 0.9)),
+            0 0 10px var(--dot-color, rgba(34, 197, 94, 0.7));
+          opacity: 0;
+          transform: translate(-50%, -50%);
+          animation: hackerDotBlink 3.2s infinite ease-in-out;
+          animation-delay: var(--delay, 0s);
+        }
+
+        /* Класс-пауза для всех точек */
+        #gridGlow.dots-paused .grid-dot {
+          animation-play-state: paused;
+        }
+
+        /* LED-индикатор в top panel */
+        .led-indicator {
+          position: relative;
+          width: 14px;
+          height: 14px;
+          border-radius: 9999px;
+          border-width: 1px;
+          border-style: solid;
+          cursor: pointer;
+          padding: 0;
+        }
+
+        .led-indicator::after {
+          content: "";
+          position: absolute;
+          inset: 3px;
+          border-radius: inherit;
+          background: rgba(248, 250, 252, 0.65);
+          opacity: 0.15;
+        }
+
+        .led-on {
+          border-color: rgba(52, 211, 153, 0.95);
+          background: radial-gradient(circle at 30% 30%, #bbf7d0 0, #22c55e 35%, #065f46 100%);
+          box-shadow:
+            0 0 4px rgba(52, 211, 153, 0.9),
+            0 0 10px rgba(52, 211, 153, 0.7);
+        }
+
+        .led-off {
+          border-color: rgba(148, 163, 184, 0.6);
+          background: radial-gradient(circle at 30% 30%, #0f172a 0, #020617 70%);
+          box-shadow: none;
+        }
+
+        /* Глобальный слой для плавного затухания/включения мигания */
+        .motion-layer {
+          opacity: 1;
+          transition: opacity 0.55s ease-in-out;
+        }
+
+        .motion-layer.motion-off {
+          opacity: 0;
+        }
+
+        .eeg-strip {
+          position: relative;
+          display: flex;
+          align-items: flex-end;
+          gap: 3px;
+          width: 100%;
+          height: 10px;
+          opacity: 0.9;
+          /* лёгкое покачивание всей линии, как будто паутинка "дышит" */
+          animation: rowDrift 6.4s ease-in-out infinite;
+          animation-delay: var(--rowDelay, 0s);
+        }
+
+        .eeg-strip:nth-child(odd) {
+          opacity: 0.65;
+        }
+
+        .eq-bar {
+          flex: 1;
+          max-width: 6px;
+          border-radius: 9999px;
+          background: linear-gradient(to top, rgba(15, 23, 42, 0.0), rgba(148, 163, 184, 0.7));
+          transform-origin: bottom center;
+          transform: scaleY(0.15);
+          opacity: 0.85;
+          animation: eqPulse 1.8s ease-in-out infinite;
+          animation-delay: var(--delay, 0s);
+          animation-duration: var(--duration, 1.8s);
+        }
+
+        .eq-bar:nth-child(3n) {
+          background: linear-gradient(to top, rgba(15, 23, 42, 0.0), rgba(56, 189, 248, 0.85));
+        }
+
+        .eq-bar:nth-child(5n) {
+          background: linear-gradient(to top, rgba(15, 23, 42, 0.0), rgba(94, 234, 212, 0.9));
+        }
+
+        /* Полупрозрачная "паутина" вокруг эквалайзера */
+        .eeg-strip::before {
+          content: "";
+          position: absolute;
+          inset-inline: 0;
+          top: 2px;
+          bottom: 2px;
+          border-radius: 9999px;
+          border-top: 1px solid rgba(148, 163, 184, 0.14);
+          border-bottom: 1px solid rgba(15, 23, 42, 0.9);
+          opacity: 0.5;
+          pointer-events: none;
+        }
+
+        .eeg-strip::after {
+          content: "";
+          position: absolute;
+          inset-inline: 0;
+          top: 50%;
+          transform: translateY(-50%);
+          border-radius: 9999px;
+          border-top: 1px dashed rgba(148, 163, 184, 0.12);
+          opacity: 0.35;
+          filter: blur(0.3px);
+          pointer-events: none;
+        }
+
+        /* Пауза анимаций эквалайзера */
+        #eegTracks.eq-paused .eq-bar,
+        #eegTracks.eq-paused .eeg-strip {
+          animation-play-state: paused;
+        }
+
+        /* Квадраты элементов управления в боковых панелях */
+        .control-slot {
+          position: relative;
+          border-radius: 0.33rem;
+          border: 1px solid rgba(51, 65, 85, 0.9);
+          background: transparent;
+          box-shadow: none;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          font-size: 0.75rem;
+          letter-spacing: 0.18em;
+          text-transform: uppercase;
+          color: rgba(148, 163, 184, 0.75);
+        }
+
+        .control-slot::after {
+          content: none;
+        }
+
+        /* через один: X и + по центру слота */
+        .control-slot:nth-child(odd)::before,
+        .control-slot:nth-child(even)::before {
+          position: relative;
+          display: block;
+        }
+
+        .control-slot:nth-child(odd)::before {
+          content: "×";
+        }
+
+        .control-slot:nth-child(even)::before {
+          content: "+";
+        }
+
+        /* Crypto hacker-style text in aside */
+        .crypto-text {
+          position: relative;
+          display: inline-block;
+          letter-spacing: 0.16em;
+          text-transform: uppercase;
+        }
+
+        .crypto-text--value {
+          letter-spacing: 0.12em;
+        }
+
+        .crypto-text::after {
+          content: "";
+          position: absolute;
+          inset: -0.1rem 0;
+          border-radius: 9999px;
+          background: radial-gradient(circle at 50% 0%, rgba(56, 189, 248, 0.18), transparent 65%);
+          opacity: 0.0;
+          pointer-events: none;
+        }
+
+        .crypto-text--accent {
+          color: rgba(45, 212, 191, 0.95);
+          text-shadow:
+            0 0 4px rgba(34, 211, 238, 0.8),
+            0 0 12px rgba(34, 211, 238, 0.4);
+        }
+
+        .crypto-text--version {
+          text-shadow:
+            0 0 6px rgba(56, 189, 248, 0.7),
+            0 0 18px rgba(37, 99, 235, 0.6);
+        }
+
+        @keyframes rowDrift {
+          0%, 100% {
+            transform: translateX(0px);
+          }
+          20% {
+            transform: translateX(1.5px);
+          }
+          40% {
+            transform: translateX(-2px);
+          }
+          60% {
+            transform: translateX(1px);
+          }
+          80% {
+            transform: translateX(-1px);
+          }
+        }
+
+        @keyframes eqPulse {
+          0%, 100% {
+            transform: scaleY(0.25);
+          }
+          18% {
+            transform: scaleY(0.95);
+          }
+          38% {
+            transform: scaleY(0.4);
+          }
+          58% {
+            transform: scaleY(0.8);
+          }
+          78% {
+            transform: scaleY(0.35);
+          }
+        }
+
+        @keyframes hackerDotBlink {
+          0%, 12%, 100% {
+            opacity: 0;
+          }
+          18%, 26% {
+            opacity: 1;
+          }
+          32%, 42% {
+            opacity: 0.45;
+          }
+          55%, 70% {
+            opacity: 0;
+          }
+        }
+      }
+    </style>
+  </head>
+
+  <body class="min-h-screen bg-bg-main text-slate-100 overflow-hidden">
+    <div class="relative min-h-screen bg-blueprint">
+      <!-- Слой мигающих точек поверх грида (изначально мигания нет) -->
+      <div id="gridGlow" class="pointer-events-none absolute inset-0 motion-layer dots-paused motion-off"></div>
+
+      <!-- Верхняя панель -->
+      <div class="fixed inset-x-0 top-0 h-14 bg-slate-950/60 backdrop-blur-sm border-b border-slate-700/70 flex items-center justify-between px-6 text-[10px] uppercase tracking-[0.16em] text-slate-400">
+        <span>TOP PANEL</span>
+        <div class="flex items-center gap-3">
+          <span>UI · STATUS</span>
+          <!-- LED-индикатор вкл/выкл мигания (по умолчанию OFF) -->
+          <button
+            id="blinkToggle"
+            type="button"
+            aria-label="Toggle grid glow"
+            class="led-indicator led-off"
+          ></button>
+        </div>
+      </div>
+
+      <!-- Нижняя панель -->
+      <div class="fixed inset-x-0 bottom-0 h-14 bg-slate-950/60 backdrop-blur-sm border-t border-slate-700/70 flex items-center justify-between px-6 text-[10px] uppercase tracking-[0.16em] text-slate-400">
+        <span>BOTTOM PANEL</span>
+        <span>LOG · TIMELINE</span>
+      </div>
+
+      <!-- Левая панель -->
+      <div class="fixed left-0 top-14 bottom-14 w-40 bg-slate-950/60 backdrop-blur-sm border-r border-slate-700/70 px-3 py-4 text-[10px] uppercase tracking-[0.16em] text-slate-400">
+        <div class="flex flex-col h-full">
+          <div class="flex items-center justify-start text-[9px]">
+            <span>LEFT PANEL</span>
+          </div>
+          <div class="mt-3 flex-1 grid grid-rows-11 gap-[3px]">
+            <div class="control-slot"></div>
+            <div class="control-slot"></div>
+            <div class="control-slot"></div>
+            <div class="control-slot"></div>
+            <div class="control-slot"></div>
+            <div class="control-slot"></div>
+            <div class="control-slot"></div>
+            <div class="control-slot"></div>
+            <div class="control-slot"></div>
+            <div class="control-slot"></div>
+            <div class="control-slot"></div>
+          </div>
+          <div class="mt-3 text-[8px] text-slate-500 normal-case tracking-normal">
+            widgets / controls
+          </div>
+        </div>
+      </div>
+
+      <!-- Правая панель -->
+      <div class="fixed right-0 top-14 bottom-14 w-40 bg-slate-950/60 backdrop-blur-sm border-l border-slate-700/70 px-3 py-4 text-[10px] uppercase tracking-[0.16em] text-slate-400">
+        <div class="flex flex-col h-full">
+          <div class="flex items-center justify-end text-[9px]">
+            <span>RIGHT PANEL</span>
+          </div>
+          <div class="mt-3 flex-1 grid grid-rows-11 gap-[3px]">
+            <div class="control-slot"></div>
+            <div class="control-slot"></div>
+            <div class="control-slot"></div>
+            <div class="control-slot"></div>
+            <div class="control-slot"></div>
+            <div class="control-slot"></div>
+            <div class="control-slot"></div>
+            <div class="control-slot"></div>
+            <div class="control-slot"></div>
+            <div class="control-slot"></div>
+            <div class="control-slot"></div>
+          </div>
+          <div class="mt-3 text-[8px] text-slate-500 normal-case tracking-normal text-right">
+            graphs / metrics
+          </div>
+        </div>
+      </div>
+
+      <!-- ХОЛСТОВЫЕ ШКАЛЫ -->
+      <div class="pointer-events-none fixed left-40 top-16 bottom-16 w-[6px] ruler-y"></div>
+      <div class="pointer-events-none fixed left-44 right-44 bottom-14 h-[6px] ruler-x"></div>
+
+      <!-- Линии эквалайзера между штрихами слева (изначально без движения) -->
+      <div
+        id="eegTracks"
+        class="pointer-events-none absolute top-16 bottom-16 left-[10.375rem] right-40 flex flex-col justify-between motion-layer eq-paused motion-off"
+      ></div>
+
+      <!-- HUD-aside: 40px от топ-панели и 40px от правой панели -->
+      <aside class="absolute top-24 left-40 right-40 flex justify-end pointer-events-none">
+        <div id="asidePanel" class="pointer-events-auto z-10 mr-10 grid grid-cols-[1fr_auto] gap-x-10 gap-y-1 rounded-md border border-slate-700/70 bg-slate-950/85 px-6 py-4 shadow-xl backdrop-blur">
+          <!-- Левая колонка: заголовки и стек -->
+          <div class="space-y-1">
+            <div class="flex justify-between uppercase tracking-[0.14em] text-slate-400">
+              <span class="crypto-text" data-text="Title">Title</span>
+              <span class="crypto-text" data-text="Build">Build</span>
+            </div>
+            <div class="flex justify-between text-slate-100">
+              <span class="font-mono crypto-text crypto-text--value" data-text="tailwindcss">tailwindcss</span>
+              <span class="font-mono text-emerald-400 crypto-text crypto-text--accent" data-text="stable">stable</span>
+            </div>
+
+            <div class="mt-3 uppercase tracking-[0.14em] text-slate-400 crypto-text" data-text="Stack">
+              Stack
+            </div>
+            <div class="space-y-0.5 text-slate-300">
+              <div class="flex justify-between font-mono">
+                <span class="crypto-text crypto-text--value" data-text="TypeScript">TypeScript</span>
+                <span class="crypto-text crypto-text--value" data-text="91.6%">91.6%</span>
+              </div>
+              <div class="flex justify-between font-mono">
+                <span class="crypto-text crypto-text--value" data-text="Rust">Rust</span>
+                <span class="crypto-text crypto-text--value" data-text="6.0%">6.0%</span>
+              </div>
+              <div class="flex justify-between font-mono">
+                <span class="crypto-text crypto-text--value" data-text="CSS">CSS</span>
+                <span class="crypto-text crypto-text--value" data-text="1.4%">1.4%</span>
+              </div>
+              <div class="flex justify-between font-mono">
+                <span class="crypto-text crypto-text--value" data-text="Other">Other</span>
+                <span class="crypto-text crypto-text--value" data-text="1.0%">1.0%</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Правая колонка: версия и мини-график -->
+          <div class="flex flex-col items-end justify-between">
+            <div class="uppercase tracking-[0.14em] text-slate-400 crypto-text" data-text="Version">
+              Version
+            </div>
+            <div class="font-mono text-5xl font-light tabular-nums text-slate-100 crypto-text crypto-text--version" data-text="4.0">
+              4.0
+            </div>
+
+            <svg
+              viewBox="0 0 80 40"
+              class="mt-4 h-10 w-20 text-slate-500"
+            >
+              <rect
+                x="1"
+                y="1"
+                width="78"
+                height="38"
+                rx="4"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="0.6"
+                stroke-dasharray="2 2"
+              />
+              <polyline
+                points="4,30 14,24 24,26 34,18 46,20 60,10 76,16"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="0.9"
+              />
+            </svg>
+          </div>
+        </div>
+      </aside>
+
+      <!-- CENTRAL WAVESURFER PLAYER -->
+      <div class="fixed top-32 bottom-24 left-44 right-44 flex items-center justify-center">
+        <div class="relative z-20 w-full max-w-4xl rounded-md border border-slate-700/80 bg-slate-950/85 px-6 py-4 shadow-2xl backdrop-blur">
+          <div class="flex items-center justify-between text-[10px] uppercase tracking-[0.16em] text-slate-400">
+            <span>FORENSIC · AUDIO TRACE · WS</span>
+            <span id="playerStatus" class="font-mono text-[9px] text-slate-500">idle</span>
+          </div>
+          <div class="mt-2 h-px w-full bg-gradient-to-r from-slate-800 via-sky-500/80 to-slate-800"></div>
+
+          <div class="mt-4">
+            <!-- data-audio можно заполнить своим URL; при загрузке через UI он будет переопределён -->
+            <div id="waveform" class="w-full h-24" data-audio=""></div>
+          </div>
+
+          <!-- URL loader -->
+          <div class="mt-4 flex flex-wrap items-center gap-3 text-[10px] uppercase tracking-[0.16em] text-slate-400">
+            <span>Source URL</span>
+            <input
+              id="audioUrlInput"
+              type="text"
+              placeholder="https://example.com/forensic_trace.mp3"
+              class="flex-1 min-w-[10rem] rounded border border-slate-600 bg-slate-900/80 px-2 py-1 text-[11px] font-mono text-slate-100 focus:outline-none focus:border-sky-400"
+            />
+            <button
+              id="btnLoadUrl"
+              type="button"
+              class="px-3 py-1.5 border border-sky-500/70 bg-slate-900/80 text-[10px] uppercase tracking-[0.16em] text-sky-100 hover:bg-sky-500/10 hover:border-sky-300 transition"
+            >
+              Load URL
+            </button>
+          </div>
+
+          <!-- Local file loader -->
+          <div class="mt-3 flex flex-wrap items-center gap-3 text-[10px] uppercase tracking-[0.16em] text-slate-400">
+            <span>Local file</span>
+            <label class="inline-flex items-center px-3 py-1.5 border border-emerald-500/70 bg-slate-900/80 text-[10px] uppercase tracking-[0.16em] text-emerald-100 hover:bg-emerald-500/10 hover:border-emerald-300 transition cursor-pointer">
+              <span>Select…</span>
+              <input
+                id="audioFileInput"
+                type="file"
+                accept="audio/*"
+                class="hidden"
+              />
+            </label>
+            <span id="audioFileName" class="flex-1 min-w-[6rem] max-w-[14rem] truncate font-mono text-[11px] text-slate-500">
+              no file selected
+            </span>
+          </div>
+
+          <div class="mt-4 flex flex-wrap items-center justify-between gap-4">
+            <div class="flex items-center gap-2">
+              <button
+                id="btnPlayPause"
+                type="button"
+                class="px-3 py-1.5 border border-slate-600/80 bg-slate-900/80 text-[10px] uppercase tracking-[0.16em] text-slate-100 hover:border-sky-400 hover:text-sky-200 transition"
+              >
+                Play
+              </button>
+              <button
+                id="btnStop"
+                type="button"
+                class="px-3 py-1.5 border border-slate-600/80 bg-slate-900/80 text-[10px] uppercase tracking-[0.16em] text-slate-100 hover:border-rose-400 hover:text-rose-200 transition"
+              >
+                Stop
+              </button>
+            </div>
+
+            <div class="flex items-center gap-3 text-[10px] uppercase tracking-[0.16em] text-slate-400">
+              <span>Time</span>
+              <span id="timeCurrent" class="font-mono text-xs text-slate-100">00:00</span>
+              <span>/</span>
+              <span id="timeTotal" class="font-mono text-xs text-slate-500">00:00</span>
+            </div>
+          </div>
+
+          <div class="mt-3 flex flex-wrap items-center justify-between gap-4 text-[10px] uppercase tracking-[0.16em] text-slate-400">
+            <div class="flex items-center gap-2">
+              <span>Zoom</span>
+              <input
+                id="zoomSlider"
+                type="range"
+                min="0"
+                max="200"
+                step="10"
+                value="0"
+                class="w-32 accent-sky-400"
+              />
+            </div>
+            <div class="flex items-center gap-2">
+              <span>Volume</span>
+              <input
+                id="volumeSlider"
+                type="range"
+                min="0"
+                max="1"
+                step="0.05"
+                value="0.8"
+                class="w-32 accent-emerald-400"
+              />
+            </div>
+          </div>
+        </div>
+      </div>
+      <!-- /CENTRAL WAVESURFER PLAYER -->
+    </div>
+
+    <script>
+      (function() {
+        const gridStep = 110; // размер крупной сетки из background-size
+        const dotOffset = gridStep / 2; // центр квадрата
+        const dotColors = [
+          'rgba(34, 197, 94, 0.95)',  // hacker green
+          'rgba(239, 68, 68, 0.95)',  // red
+          'rgba(59, 130, 246, 0.95)', // blue
+          'rgba(15, 23, 42, 0.95)',   // near-black
+          'rgba(234, 179, 8, 0.95)'   // gold
+        ];
+
+        function populateDots() {
+          const container = document.getElementById('gridGlow');
+          if (!container) return;
+
+          container.innerHTML = '';
+          const rect = container.getBoundingClientRect();
+          const cols = Math.ceil(rect.width / gridStep);
+          const rows = Math.ceil(rect.height / gridStep);
+
+          for (let y = 0; y <= rows; y++) {
+            for (let x = 0; x <= cols; x++) {
+              const dot = document.createElement('span');
+              dot.className = 'grid-dot';
+
+              const color = dotColors[Math.floor(Math.random() * dotColors.length)];
+              dot.style.setProperty('--dot-color', color);
+
+              dot.style.left = x * gridStep + dotOffset + 'px';
+              dot.style.top  = y * gridStep + dotOffset + 'px';
+
+              dot.style.setProperty('--delay', (Math.random() * 4).toFixed(2) + 's');
+              dot.style.animationDuration = (2.4 + Math.random() * 2.8).toFixed(2) + 's';
+
+              container.appendChild(dot);
+            }
+          }
+        }
+
+        function createEEGStripes() {
+          const panel = document.getElementById('eegTracks');
+          if (!panel) return;
+
+          panel.innerHTML = '';
+          const lanes = 11;
+          const barsPerRow = 16;
+
+          for (let i = 0; i < lanes; i++) {
+            const row = document.createElement('div');
+            row.className = 'eeg-strip';
+
+            const rowDelay = (Math.random() * 3.2).toFixed(2) + 's';
+            row.style.setProperty('--rowDelay', rowDelay);
+
+            for (let j = 0; j < barsPerRow; j++) {
+              const bar = document.createElement('span');
+              bar.className = 'eq-bar';
+
+              const delay = (Math.random() * 1.4 + i * 0.07 + j * 0.03).toFixed(2) + 's';
+              const duration = (1.6 + Math.random() * 1.2).toFixed(2) + 's';
+              bar.style.setProperty('--delay', delay);
+              bar.style.setProperty('--duration', duration);
+
+              row.appendChild(bar);
+            }
+
+            panel.appendChild(row);
+          }
+        }
+
+        // Crypto-анимация: один прогон
+        function playCryptoOnce() {
+          const glyphs = '01/#@$%&*+=-';
+          const nodes = document.querySelectorAll('.crypto-text');
+          if (!nodes || nodes.length === 0) return;
+
+          // Останавливаем предыдущие циклы, если были
+          if (window.__cryptoTimers && Array.isArray(window.__cryptoTimers)) {
+            window.__cryptoTimers.forEach((id) => clearInterval(id));
+          }
+          window.__cryptoTimers = [];
+
+          nodes.forEach((node, index) => {
+            const raw = node.getAttribute('data-text') || node.textContent || '';
+            const target = raw.trim();
+            if (!target) return;
+
+            let frame = 0;
+            const cycle = 40 + index * 6 + target.length * 2; // длина анимации
+
+            const timerId = setInterval(() => {
+              frame++;
+              const progress = frame / cycle;
+              let out = '';
+
+              for (let i = 0; i < target.length; i++) {
+                const threshold = ((i + 1) / target.length) * 0.85; // чем дальше по строке, тем позже стабилизируется
+                if (progress > threshold) {
+                  out += target[i];
+                } else {
+                  out += glyphs[Math.floor(Math.random() * glyphs.length)];
+                }
+              }
+
+              node.textContent = out;
+
+              if (frame >= cycle) {
+                clearInterval(timerId);
+                node.textContent = target; // финальное стабильное значение
+              }
+            }, 45 + index * 3);
+
+            window.__cryptoTimers.push(timerId);
+          });
+        }
+
+        function formatTime(sec) {
+          if (!Number.isFinite(sec)) return '00:00';
+          const m = Math.floor(sec / 60);
+          const s = Math.floor(sec % 60);
+          return String(m).padStart(2, '0') + ':' + String(s).padStart(2, '0');
+        }
+
+        function setupWavePlayer() {
+          const waveformEl = document.getElementById('waveform');
+          if (!waveformEl || typeof WaveSurfer === 'undefined') return;
+
+          const statusEl = document.getElementById('playerStatus');
+          const currentEl = document.getElementById('timeCurrent');
+          const totalEl   = document.getElementById('timeTotal');
+          const btnPlay   = document.getElementById('btnPlayPause');
+          const btnStop   = document.getElementById('btnStop');
+          const zoomEl    = document.getElementById('zoomSlider');
+          const volEl     = document.getElementById('volumeSlider');
+          const urlInput  = document.getElementById('audioUrlInput');
+          const btnLoad   = document.getElementById('btnLoadUrl');
+          const fileInput = document.getElementById('audioFileInput');
+          const fileNameEl = document.getElementById('audioFileName');
+
+          const ws = WaveSurfer.create({
+            container: waveformEl,
+            waveColor: 'rgba(148, 163, 184, 0.7)',
+            progressColor: 'rgba(56, 189, 248, 0.95)',
+            cursorColor: 'rgba(248, 250, 252, 0.9)',
+            cursorWidth: 1,
+            barWidth: 2,
+            barRadius: 2,
+            barGap: 1,
+            height: 96,
+            normalize: true,
+          });
+
+          const defaultUrl =
+            waveformEl.getAttribute('data-audio')?.trim() ||
+            'https://wavesurfer-js.org/example/media/demo.wav';
+
+          function loadSource(url) {
+            const src = (url || '').trim();
+            if (!src) return;
+            if (statusEl) statusEl.textContent = 'loading';
+            ws.load(src);
+          }
+
+          // Инициальная загрузка демо или предустановленного URL
+          loadSource(defaultUrl);
+          if (urlInput && !urlInput.value) {
+            urlInput.value = defaultUrl;
+          }
+
+          ws.on('ready', () => {
+            if (statusEl) statusEl.textContent = 'ready';
+            if (totalEl) totalEl.textContent = formatTime(ws.getDuration());
+
+            if (volEl) {
+              const v = parseFloat(volEl.value || '0.8');
+              ws.setVolume(v);
+            }
+            if (zoomEl) {
+              const z = parseFloat(zoomEl.value || '0');
+              ws.zoom(z);
+            }
+          });
+
+          ws.on('play', () => {
+            if (statusEl) statusEl.textContent = 'playing';
+            if (btnPlay) btnPlay.textContent = 'Pause';
+          });
+
+          ws.on('pause', () => {
+            if (statusEl) statusEl.textContent = 'paused';
+            if (btnPlay) btnPlay.textContent = 'Play';
+          });
+
+          ws.on('finish', () => {
+            if (statusEl) statusEl.textContent = 'finished';
+            if (btnPlay) btnPlay.textContent = 'Play';
+            if (currentEl) currentEl.textContent = '00:00';
+          });
+
+          ws.on('timeupdate', (time) => {
+            if (currentEl) currentEl.textContent = formatTime(time);
+          });
+
+          if (btnPlay) {
+            btnPlay.addEventListener('click', () => {
+              ws.playPause();
+            });
+          }
+
+          if (btnStop) {
+            btnStop.addEventListener('click', () => {
+              ws.stop();
+            });
+          }
+
+          if (volEl) {
+            volEl.addEventListener('input', (e) => {
+              const v = parseFloat(e.target.value);
+              if (!Number.isNaN(v)) ws.setVolume(v);
+            });
+          }
+
+          if (zoomEl) {
+            zoomEl.addEventListener('input', (e) => {
+              const z = parseFloat(e.target.value);
+              if (!Number.isNaN(z)) ws.zoom(z);
+            });
+          }
+
+          // Загрузка по URL из инпута
+          if (btnLoad && urlInput) {
+            btnLoad.addEventListener('click', () => {
+              const u = urlInput.value.trim();
+              if (!u) return;
+              loadSource(u);
+              if (fileNameEl) {
+                const label = u.length > 40 ? u.slice(0, 37) + '…' : u;
+                fileNameEl.textContent = 'remote: ' + label;
+              }
+            });
+
+            urlInput.addEventListener('keydown', (e) => {
+              if (e.key === 'Enter') {
+                e.preventDefault();
+                const u = urlInput.value.trim();
+                if (!u) return;
+                loadSource(u);
+                if (fileNameEl) {
+                  const label = u.length > 40 ? u.slice(0, 37) + '…' : u;
+                  fileNameEl.textContent = 'remote: ' + label;
+                }
+              }
+            });
+          }
+
+          // Локальная загрузка файла (input type="file")
+          if (fileInput) {
+            fileInput.addEventListener('change', (e) => {
+              const input = e.target;
+              const file = input.files && input.files[0];
+              if (!file) return;
+              if (statusEl) statusEl.textContent = 'loading';
+              if (fileNameEl) fileNameEl.textContent = file.name;
+              if (urlInput) urlInput.value = '';
+              ws.loadBlob(file);
+            });
+          }
+
+          // для дебага, если нужно
+          window.__waveSurfer = ws;
+        }
+
+        function init() {
+          populateDots();
+          createEEGStripes();
+          playCryptoOnce(); // один прогон при загрузке
+          setupWavePlayer(); // инициализация аудио-плеера по центру
+        }
+
+        window.addEventListener('load', init);
+        window.addEventListener('resize', () => {
+          populateDots();
+          createEEGStripes();
+        });
+
+        // LED-индикатор: вкл/выкл всего мигания (точки + эквалайзер)
+        const toggle   = document.getElementById('blinkToggle');
+        const grid     = document.getElementById('gridGlow');
+        const eqTracks = document.getElementById('eegTracks');
+        const asidePanel = document.getElementById('asidePanel');
+        let motionOn   = false; // стартуем без мигания
+
+        if (toggle && grid) {
+          toggle.addEventListener('click', () => {
+            motionOn = !motionOn;
+
+            if (motionOn) {
+              // ВКЛ: снимаем паузы и плавно возвращаем opacity
+              grid.classList.remove('dots-paused', 'motion-off');
+              if (eqTracks) eqTracks.classList.remove('eq-paused', 'motion-off');
+
+              toggle.classList.remove('led-off');
+              toggle.classList.add('led-on');
+            } else {
+              // ВЫКЛ: сначала запускаем плавное затухание
+              grid.classList.add('motion-off');
+              if (eqTracks) eqTracks.classList.add('motion-off');
+
+              toggle.classList.remove('led-on');
+              toggle.classList.add('led-off');
+
+              // после завершения fade-out ставим анимации на паузу
+              setTimeout(() => {
+                grid.classList.add('dots-paused');
+                if (eqTracks) eqTracks.classList.add('eq-paused');
+              }, 600); // чуть больше, чем transition 0.55s
+            }
+          });
+        }
+
+        // Повторный запуск crypto-анимации при клике по aside-панели
+        if (asidePanel) {
+          asidePanel.addEventListener('click', () => {
+            playCryptoOnce();
+          });
+        }
+      })();
+    </script>
+  </body>
+</html>

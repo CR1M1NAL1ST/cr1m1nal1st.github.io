@@ -3,10 +3,15 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Tailwind 4 · BG + Aside + Canvas Rulers + WaveSurfer + Strudel</title>
+    <title>Cypher Grid · WaveSurfer + Strudel IDE</title>
+
+    <!-- Tailwind CSS v4 CDN -->
     <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <!-- WaveSurfer.js v7 -->
     <script src="https://unpkg.com/wavesurfer.js@7/dist/wavesurfer.min.js"></script>
-    <script src="https://unpkg.com/@strudel/repl@latest"></script>
+    <!-- Strudel live-coding REPL via @strudel/embed (iframe-based, styled в нашем FUI) -->
+    <script src="https://unpkg.com/@strudel/embed@latest"></script>
+
     <style type="text/tailwindcss">
       @theme {
         --color-bg-main: #020617; /* фон */
@@ -86,7 +91,7 @@
         }
 
         .ruler-x::after {
-          /* длинные штрихи на границах крупных квадратов, толщина та же, длина больше */
+          /* длинные штрихи на границах крупных квадратов, толщина та же, длина больше (×2 от коротких) */
           content: "";
           position: absolute;
           left: 0;
@@ -126,7 +131,7 @@
         }
 
         .ruler-y::after {
-          /* длинные штрихи на границах крупных квадратов, толщина та же, длина больше */
+          /* длинные штрихи на границах крупных квадратов, толщина та же, длина больше (×2 от коротких) */
           content: "";
           position: absolute;
           top: 0;
@@ -158,12 +163,10 @@
           animation-delay: var(--delay, 0s);
         }
 
-        /* Класс-пауза для всех точек */
         #gridGlow.dots-paused .grid-dot {
           animation-play-state: paused;
         }
 
-        /* LED-индикатор в top panel */
         .led-indicator {
           position: relative;
           width: 14px;
@@ -198,7 +201,6 @@
           box-shadow: none;
         }
 
-        /* Глобальный слой для плавного затухания/включения мигания */
         .motion-layer {
           opacity: 1;
           transition: opacity 0.55s ease-in-out;
@@ -343,7 +345,6 @@
             0 0 18px rgba(37, 99, 235, 0.6);
         }
 
-        /* Waveform: прячем скролл и не даём появляться полосе при зуме */
         #waveform {
           overflow: hidden;
         }
@@ -353,7 +354,6 @@
           height: 0;
         }
 
-        /* Кастомные range-слайдеры: квадратный трек и квадратный ползунок */
         input[type="range"] {
           -webkit-appearance: none;
           appearance: none;
@@ -365,27 +365,24 @@
           outline: none;
         }
 
-        /* WebKit трек */
         input[type="range"]::-webkit-slider-runnable-track {
           height: 4px;
-          background: rgba(246, 151, 34, 0.85); /* оранжевая дорожка */
+          background: rgba(246, 151, 34, 0.85);
           border: 1px solid rgba(248, 180, 80, 0.9);
           border-radius: 0;
         }
 
-        /* WebKit ползунок */
         input[type="range"]::-webkit-slider-thumb {
           -webkit-appearance: none;
           appearance: none;
           width: 16px;
           height: 16px;
-          background: rgba(34, 197, 94, 0.95); /* зелёный FUI-квадрат */
+          background: rgba(34, 197, 94, 0.95);
           border: 1px solid rgba(22, 101, 52, 1);
           border-radius: 0;
           margin-top: -6px;
         }
 
-        /* Firefox трек */
         input[type="range"]::-moz-range-track {
           height: 4px;
           background: rgba(246, 151, 34, 0.85);
@@ -393,7 +390,6 @@
           border-radius: 0;
         }
 
-        /* Firefox ползунок */
         input[type="range"]::-moz-range-thumb {
           width: 16px;
           height: 16px;
@@ -402,11 +398,18 @@
           border-radius: 0;
         }
 
-        /* Strudel editor host: растягиваем на всю область */
-        strudel-editor {
+        strudel-repl {
           display: block;
           width: 100%;
           height: 100%;
+        }
+
+        /* iframe внутри embed должен точно совпадать по размеру с контейнером */
+        strudel-repl iframe {
+          width: 100% !important;
+          height: 100% !important;
+          display: block;
+          border: none;
         }
 
         @keyframes rowDrift {
@@ -437,10 +440,8 @@
 
   <body class="min-h-screen bg-bg-main text-slate-100 overflow-hidden">
     <div class="relative min-h-screen bg-blueprint">
-      <!-- Слой мигающих точек -->
       <div id="gridGlow" class="pointer-events-none absolute inset-0 motion-layer dots-paused motion-off"></div>
 
-      <!-- Верхняя панель -->
       <div class="fixed inset-x-0 top-0 h-14 bg-slate-950/60 backdrop-blur-sm border-b border-slate-700/70 flex items-center justify-between px-6 text-[10px] uppercase tracking-[0.16em] text-slate-400">
         <span>TOP PANEL</span>
         <div class="flex items-center gap-3">
@@ -454,13 +455,11 @@
         </div>
       </div>
 
-      <!-- Нижняя панель -->
       <div class="fixed inset-x-0 bottom-0 h-14 bg-slate-950/60 backdrop-blur-sm border-t border-slate-700/70 flex items-center justify-between px-6 text-[10px] uppercase tracking-[0.16em] text-slate-400">
         <span>BOTTOM PANEL</span>
         <span>LOG · TIMELINE</span>
       </div>
 
-      <!-- Левая панель -->
       <div class="fixed left-0 top-14 bottom-14 w-40 bg-slate-950/60 backdrop-blur-sm border-r border-slate-700/70 px-3 py-4 text-[10px] uppercase tracking-[0.16em] text-slate-400">
         <div class="flex flex-col h-full">
           <div class="flex items-center justify-start text-[9px]">
@@ -478,7 +477,6 @@
         </div>
       </div>
 
-      <!-- Правая панель -->
       <div class="fixed right-0 top-14 bottom-14 w-40 bg-slate-950/60 backdrop-blur-sm border-l border-slate-700/70 px-3 py-4 text-[10px] uppercase tracking-[0.16em] text-slate-400">
         <div class="flex flex-col h-full">
           <div class="flex items-center justify-end text-[9px]">
@@ -496,17 +494,14 @@
         </div>
       </div>
 
-      <!-- ХОЛСТОВЫЕ ШКАЛЫ -->
       <div class="pointer-events-none fixed left-40 top-16 bottom-16 w-[6px] ruler-y"></div>
       <div class="pointer-events-none fixed left-44 right-44 bottom-14 h-[6px] ruler-x"></div>
 
-      <!-- Линии эквалайзера -->
       <div
         id="eegTracks"
         class="pointer-events-none absolute top-16 bottom-16 left-[10.375rem] right-40 flex flex-col justify-between motion-layer eq-paused motion-off"
       ></div>
 
-      <!-- HUD Aside -->
       <aside class="absolute top-24 left-40 right-40 flex justify-end pointer-events-none">
         <div id="asidePanel" class="pointer-events-auto z-10 mr-10 grid grid-cols-[1fr_auto] gap-x-10 gap-y-1 rounded-md border border-slate-700/70 bg-slate-950/85 px-6 py-4 shadow-xl backdrop-blur">
           <div class="space-y-1">
@@ -551,7 +546,7 @@
             </div>
 
             <svg viewBox="0 0 80 40" class="mt-4 h-10 w-20 text-slate-500">
-              <rect x="1" y="1" width="78" height="38" rx="4" fill="none" stroke="currentColor" stroke-width="0.6" stroke-dasharray="2 2"/>
+              <rect x="1" y="1" width="78" height="38" rx="4" fill="none" stroke="currentColor" stroke-width="0.6" stroke-dasharray="2 2" />
               <polyline
                 points="4,30 14,24 24,26 34,18 46,20 60,10 76,16"
                 fill="none"
@@ -564,6 +559,7 @@
       </aside>
 
       <div class="fixed top-32 bottom-24 left-44 right-44 flex flex-col items-center justify-center gap-6">
+        <!-- WAVESURFER PLAYER -->
         <div class="relative z-20 w-full max-w-4xl rounded-md border border-slate-700/80 bg-slate-950/85 px-6 py-4 shadow-2xl backdrop-blur pointer-events-auto">
           <div class="flex items-center justify-between text-[10px] uppercase tracking-[0.16em] text-slate-400">
             <span>FORENSIC · AUDIO TRACE · WS</span>
@@ -575,7 +571,6 @@
             <div id="waveform" class="w-full h-24" data-audio=""></div>
           </div>
 
-          <!-- URL loader -->
           <div class="mt-4 flex flex-wrap items-center gap-3 text-[10px] uppercase tracking-[0.16em] text-slate-400">
             <span>Source URL</span>
             <input
@@ -593,17 +588,11 @@
             </button>
           </div>
 
-          <!-- Local file loader -->
           <div class="mt-3 flex flex-wrap items-center gap-3 text-[10px] uppercase tracking-[0.16em] text-slate-400">
             <span>Local file</span>
             <label class="inline-flex items-center px-3 py-1.5 border border-emerald-500/70 bg-slate-900/80 text-[10px] uppercase tracking-[0.16em] text-emerald-100 hover:bg-emerald-500/10 hover:border-emerald-300 transition cursor-pointer">
               <span>Select…</span>
-              <input
-                id="audioFileInput"
-                type="file"
-                accept="audio/*"
-                class="hidden"
-              />
+              <input id="audioFileInput" type="file" accept="audio/*" class="hidden" />
             </label>
             <span id="audioFileName" class="flex-1 min-w-[6rem] max-w-[14rem] truncate font-mono text-[11px] text-slate-500">
               no file selected
@@ -663,18 +652,18 @@
             </div>
           </div>
         </div>
-        <!-- /WAVESURFER PLAYER CARD -->
+        <!-- /WAVESURFER PLAYER -->
 
         <!-- STRUDEL LIVE-CODING WINDOW -->
         <div class="relative z-10 w-full max-w-5xl min-h-[22rem] rounded-md border border-slate-700/80 bg-slate-950/90 px-4 pt-3 pb-4 shadow-xl backdrop-blur pointer-events-auto">
           <div class="flex items-center justify-between text-[10px] uppercase tracking-[0.16em] text-slate-400">
             <span>STRD · PATTERN ENGINE · LIVE</span>
-            <span class="font-mono text-[9px] text-slate-500">@strudel/repl · script</span>
+            <span class="font-mono text-[9px] text-slate-500">@strudel/embed · iframe</span>
           </div>
           <div class="mt-2 h-px w-full bg-gradient-to-r from-slate-800 via-emerald-400/70 to-slate-800"></div>
 
           <div class="mt-3 relative w-full h-[20rem] rounded-sm border border-slate-800/80 bg-slate-950/70 overflow-hidden">
-            <strudel-editor>
+            <strudel-repl>
               <!--
               setcps(1)
               n("<0 1 2 3 4>*8").scale('G4 minor')
@@ -685,12 +674,11 @@
                 .sometimes(add(note("12")))
                 .lpf(perlin.range(200,20000).slow(4))
               -->
-            </strudel-editor>
+            </strudel-repl>
           </div>
         </div>
-        <!-- /STRUDEL WINDOW -->
+        <!-- /STRUDEL LIVE-CODING WINDOW -->
       </div>
-      <!-- /CENTRAL PLAYGROUND -->
     </div>
 
     <script>
@@ -825,7 +813,8 @@
           node.style.fontSize = '11px';
           node.style.letterSpacing = '0.14em';
           node.style.textTransform = 'uppercase';
-          node.style.boxShadow = '0 0 0 1px rgba(15,23,42,1), 0 18px 45px rgba(15,23,42,0.9)';
+          node.style.boxShadow =
+            '0 0 0 1px rgba(15,23,42,1), 0 18px 45px rgba(15,23,42,0.9)';
 
           node.style.position = 'fixed';
           node.style.top = '4.25rem';
@@ -860,6 +849,24 @@
 
           obs.observe(body, { childList: true, subtree: true });
           window.__strudelToastObserver = obs;
+        }
+
+        function fitStrudelFrame() {
+          const host = document.querySelector('strudel-repl');
+          if (!host) return;
+
+          host.style.display = 'block';
+          host.style.width = '100%';
+          host.style.height = '100%';
+
+          const iframe = host.querySelector('iframe');
+          if (iframe) {
+            iframe.style.width = '100%';
+            iframe.style.height = '100%';
+            iframe.style.display = 'block';
+            iframe.removeAttribute('width');
+            iframe.removeAttribute('height');
+          }
         }
 
         function formatTime(sec) {
@@ -900,7 +907,7 @@
 
           const defaultUrl =
             waveformEl.getAttribute('data-audio')?.trim() ||
-            ' ';
+            'https://wavesurfer-js.org/example/media/demo.wav';
 
           function loadSource(url) {
             const src = (url || '').trim();
@@ -1020,12 +1027,16 @@
           playCryptoOnce();
           setupWavePlayer();
           watchStrudelToast();
+          fitStrudelFrame();
+          setTimeout(fitStrudelFrame, 800);
+          setTimeout(fitStrudelFrame, 2000);
         }
 
         window.addEventListener('load', init);
         window.addEventListener('resize', () => {
           populateDots();
           createEEGStripes();
+          fitStrudelFrame();
         });
 
         const toggle = document.getElementById('blinkToggle');

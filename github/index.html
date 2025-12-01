@@ -1,0 +1,453 @@
+<!DOCTYPE html>
+<html lang="ru" data-color-mode="dark" data-dark-theme="dark">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>Цифровой Криминалист – Шаблон дела № 2037</title>
+
+    <!-- Primer CSS по CDN -->
+    <link
+      rel="stylesheet"
+      href="https://unpkg.com/@primer/css@^20.2.4/dist/primer.css"
+    >
+
+    <style>
+      body {
+        margin: 0;
+      }
+
+      .repo-shell {
+        max-width: 1280px;
+        margin: 0 auto;
+      }
+
+      .app-header {
+        position: relative;
+        z-index: 10;
+      }
+
+      .repo-main-layout {
+        display: flex;
+        align-items: flex-start;
+        gap: 1.5rem;
+      }
+
+      .repo-main {
+        flex: 1 1 auto;
+        min-width: 0;
+      }
+
+            .repo-aside {
+        width: 280px;
+        flex-shrink: 0;
+      }
+
+      .repo-main .Box-row .Link {
+        color: #ffffff;
+      }
+
+      a {
+        font-weight: 600;
+      }
+
+      .readme-wrapper {
+        /* лёгкое отделение шаблона структуры от листинга */
+      }
+
+      @media (max-width: 1012px) {
+        .repo-main-layout {
+          flex-direction: column;
+        }
+
+        .repo-aside {
+          width: 100%;
+        }
+      }
+    </style>
+  </head>
+
+  <body class="color-bg-canvas color-fg-default">
+
+    <!-- 1. App header -->
+        <!-- 1. App header -->
+    <header class="app-header color-bg-subtle border-bottom px-3 py-2">
+      <div class="repo-shell d-flex flex-items-center">
+        <svg style="fill: white;" xmlns="http://www.w3.org/2000/svg" width="148" height="12.58" fill="none" viewBox="0 0 148 12.58" class="hidden xl:block"><defs> 
+  <clipPath id="logo-a">
+    <path fill="#fff" d="M0 0h148v12.58H0z"></path></clipPath></defs>
+  <g clip-path="url(#logo-a)">
+    <mask id="logo-b" width="148" height="11.903" x="0" y="0" mask-type="alpha" maskUnits="userSpaceOnUse">
+      <path fill="#000" d="M0 0h148v11.903H0z"></path></mask>
+    <g fill="var(--color-primary )" mask="url(#logo-b)">
+    <path fill-rule="evenodd" d="M36.459 8.063h-5.872a.18.18 0 0 1-.18-.18V4.009c0-.1.082-.18.18-.18h5.872V.202h-17.15v3.625h5.843c.1 0 .18.081.18.18v3.875c0 .1-.082.18-.18.18h-5.843v3.627h17.15V8.063ZM54.913 3.827V.202h-17.15v3.625h5.842c.1 0 .18.081.18.18v7.684h5.076V4.006c0-.1.082-.18.18-.18h5.872ZM18.123 11.69l.004-6.177H9.804v1.841h2.797c.085 0 .12.037.135.069.015.031.022.081-.027.148-.702.914-2.224 1.02-3.308 1.02-.24 0-.468-.007-.67-.01-1.12-.026-2.042-.087-2.784-.61-.551-.39-.888-1.12-.897-1.954-.01-.86.333-1.653.895-2.067.594-.438 1.543-.653 2.903-.653.538 0 1.073.033 1.572.068.88.063 2.06.49 2.446 1.499h5.226c-.135-1.92-1.26-3.236-3.354-4.003C12.831.159 10.516.078 8.942.078c-.387 0-.75.006-.988.01-1.99.036-3.56.307-4.799.828C1.474 1.625.463 2.798.153 4.406c-.204 1.046-.204 2.216 0 3.124.362 1.628 1.352 2.758 3.026 3.454 1.578.655 3.488.782 4.788.821.2.006.396.01.583.01 1.944 0 3.463-.343 4.782-1.079a.147.147 0 0 1 .074-.022c.055 0 .113.039.117.128l.026.824 4.575.025Z">
+    </path>
+    <path d="M74.221.211 68.843.204 65.561 7.6a.183.183 0 0 1-.168.11.181.181 0 0 1-.166-.106l-3.482-7.4h-5.87l5.681 11.48h7.376L74.222.21ZM106.287 11.676l5.383.007c-.113-.196-.209-.49-.209-1.178V8.749c0-1.326-.771-2.274-2.172-2.67a.197.197 0 0 1-.009-.38c.797-.256 2.133-.918 2.133-2.467v-.157c0-1.003-.409-1.722-1.252-2.201-.783-.445-1.954-.67-3.482-.67H94.13v11.48h4.999V8.01c0-.102.081-.183.183-.183h4.475c1.665 0 2.441.662 2.441 2.083v1.395c0 .18.011.298.059.37ZM106.054 4c0 .427-.226.938-1.306.938h-5.434a.182.182 0 0 1-.183-.183V3.229c0-.102.082-.184.183-.184h5.434c1.078 0 1.306.528 1.306.955ZM129.405 7.981v-.22c0-1.192-.437-2-1.375-2.546-.985-.573-2.514-.866-4.814-.92l-2.268-.045c-1.835-.043-2.518-.285-2.518-.892 0-.526.361-.844 2.2-.844h.08c1.477 0 2.251.35 2.364 1.07l5.899.01c0-1.083-.47-1.933-1.437-2.508C126.324.366 124.285 0 121.477 0h-1.758c-2.656 0-4.514.324-5.679.99-.975.557-1.448 1.363-1.448 2.462v.14c0 1.031.366 1.806 1.117 2.372.934.703 2.507 1.094 4.671 1.159l2.364.062c2.146.06 2.567.424 2.567 1.033 0 .705-.761 1.063-2.393 1.063-1.535 0-2.428-.475-2.528-1.413l-5.991-.013c0 1.071.385 1.952 1.175 2.588 1.204.97 3.336 1.462 6.338 1.462h1.805c2.938 0 5.051-.415 6.283-1.232.946-.628 1.405-1.512 1.405-2.692ZM92.817 3.522V.205H75.353v11.502h17.464V8.4h-12.29a.183.183 0 0 1-.183-.183v-.844c0-.102.081-.183.184-.183h10.938V4.73H80.528a.183.183 0 0 1-.184-.184v-.841c0-.102.081-.184.184-.184h12.289ZM147.999 3.522V.205h-17.464v11.502h17.464V8.4h-12.29a.182.182 0 0 1-.183-.183v-.844c0-.102.081-.183.183-.183h10.939V4.73h-10.939a.182.182 0 0 1-.183-.184v-.841c0-.102.081-.184.183-.184h12.29Z">
+    </path>
+    </g>
+  </g>
+</svg>
+      </div>
+    </header>
+
+    <!-- 2. Repo header + nav + main layout -->
+    <main class="px-3 pt-3 pb-6">
+      <div class="repo-shell">
+
+        <!-- Context region: owner / repo + Public -->
+        <div class="d-flex flex-items-center flex-justify-between mb-2">
+          <div class="d-flex flex-items-center">
+            <a href="#" class="Link text-semibold mr-1">GitVerse</a>
+            <span class="color-fg-muted mr-1">/</span>
+            <strong class="text-bold mr-2" style="color: darkorange; font-weight: 900;">Цифровой Криминалист</strong>
+            <span class="Label Label--secondary mr-2">Forensic case</span>
+            <span class="color-fg-muted text-small" style="font-weight: 900;">Шаблон дела № 2037</span>
+          </div>
+
+          <div class="d-flex flex-items-center">
+            <button class="btn btn-sm mr-2">
+              <svg aria-hidden="true" focusable="false" class="octicon octicon-eye mr-2" viewBox="0 0 16 16" width="16" height="16" fill="currentColor" display="inline-block" overflow="visible" style="vertical-align: text-bottom;"><path d="M8 2c1.981 0 3.671.992 4.933 2.078 1.27 1.091 2.187 2.345 2.637 3.023a1.62 1.62 0 0 1 0 1.798c-.45.678-1.367 1.932-2.637 3.023C11.67 13.008 9.981 14 8 14c-1.981 0-3.671-.992-4.933-2.078C1.797 10.83.88 9.576.43 8.898a1.62 1.62 0 0 1 0-1.798c.45-.677 1.367-1.931 2.637-3.022C4.33 2.992 6.019 2 8 2ZM1.679 7.932a.12.12 0 0 0 0 .136c.411.622 1.241 1.75 2.366 2.717C5.176 11.758 6.527 12.5 8 12.5c1.473 0 2.825-.742 3.955-1.715 1.124-.967 1.954-2.096 2.366-2.717a.12.12 0 0 0 0-.136c-.412-.621-1.242-1.75-2.366-2.717C10.824 4.242 9.473 3.5 8 3.5c-1.473 0-2.825.742-3.955 1.715-1.124.967-1.954 2.096-2.366 2.717ZM8 10a2 2 0 1 1-.001-3.999A2 2 0 0 1 8 10Z"></path></svg>
+              Watch <span class="Counter ml-1">0</span>
+            </button>
+            <button class="btn btn-sm mr-2">
+              <svg aria-hidden="true" height="16" viewBox="0 0 16 16" version="1.1" width="16" data-view-component="true" class="octicon octicon-repo-forked mr-2">
+                <path d="M5 5.372v.878c0 .414.336.75.75.75h4.5a.75.75 0 0 0 .75-.75v-.878a2.25 2.25 0 1 1 1.5 0v.878a2.25 2.25 0 0 1-2.25 2.25h-1.5v2.128a2.251 2.251 0 1 1-1.5 0V8.5h-1.5A2.25 2.25 0 0 1 3.5 6.25v-.878a2.25 2.25 0 1 1 1.5 0ZM5 3.25a.75.75 0 1 0-1.5 0 .75.75 0 0 0 1.5 0Zm6.75.75a.75.75 0 1 0 0-1.5.75.75 0 0 0 0 1.5Zm-3 8.75a.75.75 0 1 0-1.5 0 .75.75 0 0 0 1.5 0Z"></path>
+              </svg>
+              Fork <span class="Counter ml-1">0</span>
+            </button>
+            <button class="btn btn-sm btn-primary">
+              <svg aria-hidden="true" height="16" viewBox="0 0 16 16" version="1.1" width="16" data-view-component="true" class="octicon octicon-star d-inline-block mr-2">
+                <path d="M8 .25a.75.75 0 0 1 .673.418l1.882 3.815 4.21.612a.75.75 0 0 1 .416 1.279l-3.046 2.97.719 4.192a.751.751 0 0 1-1.088.791L8 12.347l-3.766 1.98a.75.75 0 0 1-1.088-.79l.72-4.194L.818 6.374a.75.75 0 0 1 .416-1.28l4.21-.611L7.327.668A.75.75 0 0 1 8 .25Zm0 2.445L6.615 5.5a.75.75 0 0 1-.564.41l-3.097.45 2.24 2.184a.75.75 0 0 1 .216.664l-.528 3.084 2.769-1.456a.75.75 0 0 1 .698 0l2.77 1.456-.53-3.084a.75.75 0 0 1 .216-.664l2.24-2.183-3.096-.45a.75.75 0 0 1-.564-.41L8 2.694Z"></path>
+              </svg>
+              Star <span class="Counter ml-1">0</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- UnderlineNav -->
+        <nav class="UnderlineNav UnderlineNav--full mb-3" aria-label="Repository navigation">
+          <div class="UnderlineNav-body">
+            <a class="UnderlineNav-item" aria-current="page" href="#">Code</a>
+            <a class="UnderlineNav-item" href="#">Issues</a>
+            <a class="UnderlineNav-item" href="#">Pipelines</a>
+            <a class="UnderlineNav-item" href="#">Reports</a>
+            <a class="UnderlineNav-item" href="#">Security</a>
+            <a class="UnderlineNav-item" href="#">Insights</a>
+          </div>
+        </nav>
+
+        <!-- Split layout: main + aside -->
+        <div class="repo-main-layout">
+
+          <!-- Левая колонка -->
+          <section class="repo-main">
+
+            <!-- Строка ветки и действий -->
+            <div class="d-flex flex-items-center flex-justify-between mb-2">
+              <div class="d-flex flex-items-center text-small color-fg-muted">
+                <span class="color-fg-default text-semibold mr-2">main</span>
+                <span class="mr-2">1 branch</span>
+                <span>0 tags</span>
+              </div>
+
+              <div class="d-flex flex-items-center">
+                <button class="btn btn-sm mr-2">Go to file</button>
+                <button class="btn btn-sm mr-2">Add file</button>
+                <button class="btn btn-sm btn-primary">
+                  Code
+                  <span aria-hidden="true">▾</span>
+                </button>
+              </div>
+            </div>
+
+            <!-- Box с файлами -->
+            <div class="Box Box--condensed mb-3">
+              <div class="Box-header d-flex flex-items-center">
+                <span class="text-small color-fg-muted">
+                  <span class="text-bold mr-1">case-bot</span>
+                  Init forensic repository structure · 5 minutes ago · 1 commit
+                </span>
+              </div>
+
+              <!-- Директории сверху -->
+              <div class="Box-row d-flex flex-items-center">
+                <span class="mr-2 color-fg-muted" aria-hidden="true">
+  <svg aria-hidden="true" focusable="false" class="octicon octicon-file-directory-fill DirectoryRow-module__Octicon--_lwmM" viewBox="0 0 16 16" width="16" height="16" fill="currentColor" display="inline-block" overflow="visible" style="vertical-align: text-bottom;"><path d="M1.75 1A1.75 1.75 0 0 0 0 2.75v10.5C0 14.216.784 15 1.75 15h12.5A1.75 1.75 0 0 0 16 13.25v-8.5A1.75 1.75 0 0 0 14.25 3H7.5a.25.25 0 0 1-.2-.1l-.9-1.2C6.07 1.26 5.55 1 5 1H1.75Z"></path></svg>
+</span>
+                <a href="#" class="Link flex-auto">raw</a>
+                <span class="text-small color-fg-muted mr-2">
+                  Сырые доказательства (аудио, видео, изображения, сообщения)
+                </span>
+                <span class="text-small color-fg-muted">5 minutes ago</span>
+              </div>
+
+              <div class="Box-row d-flex flex-items-center">
+                <span class="mr-2 color-fg-muted" aria-hidden="true">
+  <svg aria-hidden="true" focusable="false" class="octicon octicon-file-directory-fill DirectoryRow-module__Octicon--_lwmM" viewBox="0 0 16 16" width="16" height="16" fill="currentColor" display="inline-block" overflow="visible" style="vertical-align: text-bottom;"><path d="M1.75 1A1.75 1.75 0 0 0 0 2.75v10.5C0 14.216.784 15 1.75 15h12.5A1.75 1.75 0 0 0 16 13.25v-8.5A1.75 1.75 0 0 0 14.25 3H7.5a.25.25 0 0 1-.2-.1l-.9-1.2C6.07 1.26 5.55 1 5 1H1.75Z"></path></svg>
+</span>
+                <a href="#" class="Link flex-auto">metadata</a>
+                <span class="text-small color-fg-muted mr-2">
+                  Структурные описания артефактов
+                </span>
+                <span class="text-small color-fg-muted">5 minutes ago</span>
+              </div>
+
+              <div class="Box-row d-flex flex-items-center">
+                <span class="mr-2 color-fg-muted" aria-hidden="true">
+  <svg aria-hidden="true" focusable="false" class="octicon octicon-file-directory-fill DirectoryRow-module__Octicon--_lwmM" viewBox="0 0 16 16" width="16" height="16" fill="currentColor" display="inline-block" overflow="visible" style="vertical-align: text-bottom;"><path d="M1.75 1A1.75 1.75 0 0 0 0 2.75v10.5C0 14.216.784 15 1.75 15h12.5A1.75 1.75 0 0 0 16 13.25v-8.5A1.75 1.75 0 0 0 14.25 3H7.5a.25.25 0 0 1-.2-.1l-.9-1.2C6.07 1.26 5.55 1 5 1H1.75Z"></path></svg>
+</span>
+                <a href="#" class="Link flex-auto">text-layer</a>
+                <span class="text-small color-fg-muted mr-2">
+                  Расшифровки, OCR, нормализованные диалоги
+                </span>
+                <span class="text-small color-fg-muted">5 minutes ago</span>
+              </div>
+
+              <div class="Box-row d-flex flex-items-center">
+                <span class="mr-2 color-fg-muted" aria-hidden="true">
+  <svg aria-hidden="true" focusable="false" class="octicon octicon-file-directory-fill DirectoryRow-module__Octicon--_lwmM" viewBox="0 0 16 16" width="16" height="16" fill="currentColor" display="inline-block" overflow="visible" style="vertical-align: text-bottom;"><path d="M1.75 1A1.75 1.75 0 0 0 0 2.75v10.5C0 14.216.784 15 1.75 15h12.5A1.75 1.75 0 0 0 16 13.25v-8.5A1.75 1.75 0 0 0 14.25 3H7.5a.25.25 0 0 1-.2-.1l-.9-1.2C6.07 1.26 5.55 1 5 1H1.75Z"></path></svg>
+</span>
+                <a href="#" class="Link flex-auto">ai-nlp-nlu</a>
+                <span class="text-small color-fg-muted mr-2">
+                  Результаты NLP / NLU (<a href="https://habr.com/ru/companies/sberdevices/articles/968904/" target="_blank" class="Link" style="color:#00ff88;">GigaChat</a>, <a href="https://yandex.cloud/ru/ai-models" target="_blank" class="Link" style="color:#ff5555;">Yandex</a>GPT)
+                </span>
+                <span class="text-small color-fg-muted">5 minutes ago</span>
+              </div>
+
+              <div class="Box-row d-flex flex-items-center">
+                <span class="mr-2 color-fg-muted" aria-hidden="true">
+  <svg aria-hidden="true" focusable="false" class="octicon octicon-file-directory-fill DirectoryRow-module__Octicon--_lwmM" viewBox="0 0 16 16" width="16" height="16" fill="currentColor" display="inline-block" overflow="visible" style="vertical-align: text-bottom;"><path d="M1.75 1A1.75 1.75 0 0 0 0 2.75v10.5C0 14.216.784 15 1.75 15h12.5A1.75 1.75 0 0 0 16 13.25v-8.5A1.75 1.75 0 0 0 14.25 3H7.5a.25.25 0 0 1-.2-.1l-.9-1.2C6.07 1.26 5.55 1 5 1H1.75Z"></path></svg>
+</span>
+                <a href="#" class="Link flex-auto">embeddings</a>
+                <span class="text-small color-fg-muted mr-2">
+                  Векторные пространства для поиска и кластеризации
+                </span>
+                <span class="text-small color-fg-muted">5 minutes ago</span>
+              </div>
+
+              <div class="Box-row d-flex flex-items-center">
+                <span class="mr-2 color-fg-muted" aria-hidden="true">
+  <svg aria-hidden="true" focusable="false" class="octicon octicon-file-directory-fill DirectoryRow-module__Octicon--_lwmM" viewBox="0 0 16 16" width="16" height="16" fill="currentColor" display="inline-block" overflow="visible" style="vertical-align: text-bottom;"><path d="M1.75 1A1.75 1.75 0 0 0 0 2.75v10.5C0 14.216.784 15 1.75 15h12.5A1.75 1.75 0 0 0 16 13.25v-8.5A1.75 1.75 0 0 0 14.25 3H7.5a.25.25 0 0 1-.2-.1l-.9-1.2C6.07 1.26 5.55 1 5 1H1.75Z"></path></svg>
+</span>
+                <a href="#" class="Link flex-auto">legal</a>
+                <span class="text-small color-fg-muted mr-2">
+                  Выводы <a href="https://neurolegal.ya.ru/expert" target="_blank" class="Link" style="color:violet;">Нейроюрист</a>а и юридическое отображение
+                </span>
+                <span class="text-small color-fg-muted">5 minutes ago</span>
+              </div>
+
+              <div class="Box-row d-flex flex-items-center">
+                <span class="mr-2 color-fg-muted" aria-hidden="true">
+  <svg aria-hidden="true" focusable="false" class="octicon octicon-file-directory-fill DirectoryRow-module__Octicon--_lwmM" viewBox="0 0 16 16" width="16" height="16" fill="currentColor" display="inline-block" overflow="visible" style="vertical-align: text-bottom;"><path d="M1.75 1A1.75 1.75 0 0 0 0 2.75v10.5C0 14.216.784 15 1.75 15h12.5A1.75 1.75 0 0 0 16 13.25v-8.5A1.75 1.75 0 0 0 14.25 3H7.5a.25.25 0 0 1-.2-.1l-.9-1.2C6.07 1.26 5.55 1 5 1H1.75Z"></path></svg>
+</span>
+                <a href="#" class="Link flex-auto">docs</a>
+                <span class="text-small color-fg-muted mr-2">
+                  Цепочка хранения, гайдлайны, логи моделей
+                </span>
+                <span class="text-small color-fg-muted">5 minutes ago</span>
+              </div>
+
+              <!-- Файлы ниже -->
+              <div class="Box-row d-flex flex-items-center">
+                <span class="mr-2 color-fg-muted" aria-hidden="true">
+  <svg aria-hidden="true" focusable="false" class="octicon octicon-file color-fg-muted" viewBox="0 0 16 16" width="16" height="16" fill="currentColor" display="inline-block" overflow="visible" style="vertical-align: text-bottom;"><path d="M2 1.75C2 .784 2.784 0 3.75 0h6.586c.464 0 .909.184 1.237.513l2.914 2.914c.329.328.513.773.513 1.237v9.586A1.75 1.75 0 0 1 13.25 16h-9.5A1.75 1.75 0 0 1 2 14.25Zm1.75-.25a.25.25 0 0 0-.25.25v12.5c0 .138.112.25.25.25h9.5a.25.25 0 0 0 .25-.25V6h-2.75A1.75 1.75 0 0 1 9 4.25V1.5Zm6.75.062V4.25c0 .138.112.25.25.25h2.688l-.011-.013-2.914-2.914-.013-.011Z"></path></svg>
+</span>
+                <a href="#" class="Link flex-auto">README.md</a>
+                <span class="text-small color-fg-muted mr-2">
+                  Нарратив дела и пайплайн
+                </span>
+                <span class="text-small color-fg-muted">5 minutes ago</span>
+              </div>
+
+              <div class="Box-row d-flex flex-items-center">
+                <span class="mr-2 color-fg-muted" aria-hidden="true">
+  <svg aria-hidden="true" focusable="false" class="octicon octicon-file color-fg-muted" viewBox="0 0 16 16" width="16" height="16" fill="currentColor" display="inline-block" overflow="visible" style="vertical-align: text-bottom;"><path d="M2 1.75C2 .784 2.784 0 3.75 0h6.586c.464 0 .909.184 1.237.513l2.914 2.914c.329.328.513.773.513 1.237v9.586A1.75 1.75 0 0 1 13.25 16h-9.5A1.75 1.75 0 0 1 2 14.25Zm1.75-.25a.25.25 0 0 0-.25.25v12.5c0 .138.112.25.25.25h9.5a.25.25 0 0 0 .25-.25V6h-2.75A1.75 1.75 0 0 1 9 4.25V1.5Zm6.75.062V4.25c0 .138.112.25.25.25h2.688l-.011-.013-2.914-2.914-.013-.011Z"></path></svg>
+</span>
+                <a href="#" class="Link flex-auto">timeline.gitlog</a>
+                <span class="text-small color-fg-muted mr-2">
+                  Таймлайн коммитов / сцен
+                </span>
+                <span class="text-small color-fg-muted">5 minutes ago</span>
+              </div>
+
+              <div class="Box-row d-flex flex-items-center">
+                <span class="mr-2 color-fg-muted" aria-hidden="true">
+  <svg aria-hidden="true" focusable="false" class="octicon octicon-file color-fg-muted" viewBox="0 0 16 16" width="16" height="16" fill="currentColor" display="inline-block" overflow="visible" style="vertical-align: text-bottom;"><path d="M2 1.75C2 .784 2.784 0 3.75 0h6.586c.464 0 .909.184 1.237.513l2.914 2.914c.329.328.513.773.513 1.237v9.586A1.75 1.75 0 0 1 13.25 16h-9.5A1.75 1.75 0 0 1 2 14.25Zm1.75-.25a.25.25 0 0 0-.25.25v12.5c0 .138.112.25.25.25h9.5a.25.25 0 0 0 .25-.25V6h-2.75A1.75 1.75 0 0 1 9 4.25V1.5Zm6.75.062V4.25c0 .138.112.25.25.25h2.688l-.011-.013-2.914-2.914-.013-.011Z"></path></svg>
+</span>
+                <a href="#" class="Link flex-auto">CASE.toml</a>
+                <span class="text-small color-fg-muted mr-2">
+                  Метаданные дела (ID, участники)
+                </span>
+                <span class="text-small color-fg-muted">5 minutes ago</span>
+              </div>
+
+              <div class="Box-row d-flex flex-items-center">
+                <span class="mr-2 color-fg-muted" aria-hidden="true">
+  <svg aria-hidden="true" focusable="false" class="octicon octicon-file color-fg-muted" viewBox="0 0 16 16" width="16" height="16" fill="currentColor" display="inline-block" overflow="visible" style="vertical-align: text-bottom;"><path d="M2 1.75C2 .784 2.784 0 3.75 0h6.586c.464 0 .909.184 1.237.513l2.914 2.914c.329.328.513.773.513 1.237v9.586A1.75 1.75 0 0 1 13.25 16h-9.5A1.75 1.75 0 0 1 2 14.25Zm1.75-.25a.25.25 0 0 0-.25.25v12.5c0 .138.112.25.25.25h9.5a.25.25 0 0 0 .25-.25V6h-2.75A1.75 1.75 0 0 1 9 4.25V1.5Zm6.75.062V4.25c0 .138.112.25.25.25h2.688l-.011-.013-2.914-2.914-.013-.011Z"></path></svg>
+</span>
+                <a href="#" class="Link flex-auto">pipeline.ai.yml</a>
+                <span class="text-small color-fg-muted mr-2">
+                  Пайплайн <a href="https://habr.com/ru/companies/sberdevices/articles/968904/" target="_blank" class="Link" style="color:#00ff88;">GigaChat</a> / <a href="https://yandex.cloud/ru/ai-models" target="_blank" class="Link" style="color:#ff5555;">Yandex</a>GPT / <a href="https://neurolegal.ya.ru/expert" target="_blank" class="Link" style="color:violet;">Нейроюрист</a>
+                </span>
+                <span class="text-small color-fg-muted">5 minutes ago</span>
+              </div>
+
+            </div>
+
+            <!-- Второй Box: шаблон структуры расследования -->
+            <div class="Box">
+              <div class="Box-header">
+                <strong>Шаблон_структуры_расследования.MD</strong>
+              </div>
+              <div class="Box-body">
+                <img src="https://comiccon2025.github.io/img/DigitalForensic.png" alt="Цифровой Криминалист" style="display:block; max-width:100%; border-radius:8px; margin-bottom:16px;">
+                  <pre class="mb-0"><code>gitverse-case-XXYYZZ/              # Шаблон дела № 2037
+├── README.md                      # Нарратив дела + схема пайплайна
+├── timeline.gitlog                # Таймлайн коммитов/сцен
+├── CASE.toml                      # Метаданные дела (ID, стороны, период, версии)
+├── pipeline.ai.yml                # Описание пайплайна <a href="https://habr.com/ru/companies/sberdevices/articles/968904/" target="_blank" class="Link" style="color:#00ff88;">GigaChat</a>/<a href="https://yandex.cloud/ru/ai-models" target="_blank" class="Link" style="color:#ff5555;">Yandex</a>GPT/<a href="https://neurolegal.ya.ru/expert" target="_blank" class="Link" style="color:violet;">Нейроюрист</a>
+
+├── raw/                           # Сырые доказательства
+│   ├── audio/
+│   │   ├── mic/                   # Записи с микрофонов
+│   │   ├── phone/                 # Звонки, VoIP
+│   │   └── radio/                 # Радио/эфир, v2k-захваты и т.п.
+│   ├── video/
+│   │   ├── cctv/                  # Камеры наблюдения
+│   │   ├── mobile/                # Смартфоны
+│   │   └── screen/                # Захват экрана
+│   ├── images/
+│   │   ├── scene/                 # Фотографии мест
+│   │   ├── docs/                  # Сканы документов/переписки
+│   │   └── frame-grabs/           # Ключевые кадры из видео
+│   └── messages/
+│       ├── sms/
+│       ├── messengers/            # Telegram, WhatsApp и т.д.
+│       └── email/
+
+├── metadata/                      # Структурное описание артефактов
+│   ├── evidence.index.json        # Реестр всех объектов raw/*
+│   ├── audio.meta.json            # Треки, каналы, частоты, длина, хэши
+│   ├── video.meta.json            # Камера, FPS, интервалы, лица
+│   ├── images.meta.json           # EXIF, объекты на кадрах
+│   └── messages.meta.json         # Отправитель, получатель, тред, язык
+
+├── text-layer/                    # Текстовое представление доказательств
+│   ├── transcripts.gigachat/      # Расшифровки аудио/видео (<a href="https://habr.com/ru/companies/sberdevices/articles/968904/" target="_blank" class="Link" style="color:#00ff88;">GigaChat</a> 3 Ultra)
+│   │   ├── audio/
+│   │   └── video/
+│   ├── transcripts.yagpt/         # Параллельные расшифровки <a href="https://yandex.cloud/ru/ai-models" target="_blank" class="Link" style="color:#ff5555;">Yandex</a>GPT 5.1 Pro
+│   ├── ocr/                       # Тексты, извлечённые с изображений/сканов
+│   └── normalized-dialogues/      # Приведённые диалоги (из разных источников)
+
+├── ai-nlp-nlu/                    # Слой моделей NLP + NLU
+│   ├── gigachat3-ultra/
+│   │   ├── summaries/             # Многоуровневые саммари эпизодов
+│   │   ├── entities.json          # Именованные сущности, роли, связи
+│   │   ├── topics.json            # Темы/кластеры диалогов
+│   │   └── hypotheses.md          # Машинно-сгенерированные версионные гипотезы
+│   ├── yandexgpt-5.1-pro/
+│   │   ├── semantic-frames.json   # Семантические фреймы ситуаций
+│   │   ├── intents.json           # Намерения, типы актов речи
+│   │   ├── sentiment.json         # Оценка тональности и давления
+│   │   └── contradictions.md      # Выявленные противоречия показаний
+│   └── cross-check/
+│       ├── model-diff.json        # Где модели расходятся
+│       └── consensus.md           # Зона согласия моделей (для экспертов)
+
+├── embeddings/                    # Векторные представления для поиска
+│   ├── sentences.bin
+│   ├── audio-events.bin
+│   └── image-regions.bin
+
+├── legal/                         # Юридический слой
+│   ├── neuro-lawyer/              # Выводы <a href="https://neurolegal.ya.ru/expert" target="_blank" class="Link" style="color:violet;">Нейроюрист</a>а
+│   │   ├── qualification.json     # Статьи, составы, объекты
+│   │   ├── risk-scores.json       # Оценка рисков по эпизодам
+│   │   └── comments.md            # Пояснения, оговорки, лимиты применимости
+│   ├── mapping-nlp-to-law.json    # Связка сущностей/событий с нормами
+│   └── reports/
+│       ├── case-brief.md          # Краткая юр. записка по делу
+│       └── annex-ai-trace.md      # Как ИИ пришёл к выводам (traceability)
+
+└── docs/                          # Вспомогательная документация
+    ├── chain-of-custody.md        # Цепочка хранения доказательств
+    ├── annotation-guidelines.md   # Правила ручной разметки/верификации
+    └── model-logs/                # Логи прогонов пайплайна</code></pre>
+              </div>
+            </div>
+          </section>
+
+          <!-- Правая колонка -->
+          <aside class="repo-aside">
+
+            <!-- About -->
+            <div class="Box mb-3">
+              <div class="Box-header">
+                <strong>About</strong>
+                <svg aria-label="Edit repository metadata" role="img" height="16" viewBox="0 0 16 16" version="1.1" width="16" data-view-component="true" class="octicon octicon-gear float-right">
+                  <path d="M8 0a8.2 8.2 0 0 1 .701.031C9.444.095 9.99.645 10.16 1.29l.288 1.107c.018.066.079.158.212.224.231.114.454.243.668.386.123.082.233.09.299.071l1.103-.303c.644-.176 1.392.021 1.82.63.27.385.506.792.704 1.218.315.675.111 1.422-.364 1.891l-.814.806c-.049.048-.098.147-.088.294.016.257.016.515 0 .772-.01.147.038.246.088.294l.814.806c.475.469.679 1.216.364 1.891a7.977 7.977 0 0 1-.704 1.217c-.428.61-1.176.807-1.82.63l-1.102-.302c-.067-.019-.177-.011-.3.071a5.909 5.909 0 0 1-.668.386c-.133.066-.194.158-.211.224l-.29 1.106c-.168.646-.715 1.196-1.458 1.26a8.006 8.006 0 0 1-1.402 0c-.743-.064-1.289-.614-1.458-1.26l-.289-1.106c-.018-.066-.079-.158-.212-.224a5.738 5.738 0 0 1-.668-.386c-.123-.082-.233-.09-.299-.071l-1.103.303c-.644.176-1.392-.021-1.82-.63a8.12 8.12 0 0 1-.704-1.218c-.315-.675-.111-1.422.363-1.891l.815-.806c.05-.048.098-.147.088-.294a6.214 6.214 0 0 1 0-.772c.01-.147-.038-.246-.088-.294l-.815-.806C.635 6.045.431 5.298.746 4.623a7.92 7.92 0 0 1 .704-1.217c.428-.61 1.176-.807 1.82-.63l1.102.302c.067.019.177.011.3-.071.214-.143.437-.272.668-.386.133-.066.194-.158.211-.224l.29-1.106C6.009.645 6.556.095 7.299.03 7.53.01 7.764 0 8 0Zm-.571 1.525c-.036.003-.108.036-.137.146l-.289 1.105c-.147.561-.549.967-.998 1.189-.173.086-.34.183-.5.29-.417.278-.97.423-1.529.27l-1.103-.303c-.109-.03-.175.016-.195.045-.22.312-.412.644-.573.99-.014.031-.021.11.059.19l.815.806c.411.406.562.957.53 1.456a4.709 4.709 0 0 0 0 .582c.032.499-.119 1.05-.53 1.456l-.815.806c-.081.08-.073.159-.059.19.162.346.353.677.573.989.02.03.085.076.195.046l1.102-.303c.56-.153 1.113-.008 1.53.27.161.107.328.204.501.29.447.222.85.629.997 1.189l.289 1.105c.029.109.101.143.137.146a6.6 6.6 0 0 0 1.142 0c.036-.003.108-.036.137-.146l.289-1.105c.147-.561.549-.967.998-1.189.173-.086.34-.183.5-.29.417-.278.97-.423 1.529-.27l1.103.303c.109.029.175-.016.195-.045.22-.313.411-.644.573-.99.014-.031.021-.11-.059-.19l-.815-.806c-.411-.406-.562-.957-.53-1.456a4.709 4.709 0 0 0 0-.582c-.032-.499.119-1.05.53-1.456l.815-.806c.081-.08.073-.159.059-.19a6.464 6.464 0 0 0-.573-.989c-.02-.03-.085-.076-.195-.046l-1.102.303c-.56.153-1.113.008-1.53-.27a4.44 4.44 0 0 0-.501-.29c-.447-.222-.85-.629-.997-1.189l-.289-1.105c-.029-.11-.101-.143-.137-.146a6.6 6.6 0 0 0-1.142 0ZM11 8a3 3 0 1 1-6 0 3 3 0 0 1 6 0ZM9.5 8a1.5 1.5 0 1 0-3.001.001A1.5 1.5 0 0 0 9.5 8Z"></path>
+                </svg>
+              </div>
+              <div class="Box-body">
+                <p class="f6 color-fg-muted mb-2">
+                  Конвейер платформы «<span style="color: darkorange; font-weight: 900;">Цифровой Криминалист</span>» для досудебного автоматического <a href="https://habr.com/ru/companies/sberdevices/articles/968904/" target="_blank" class="Link" style="font-weight:900; color:#00ff88;">AI</a> <a href="https://neurolegal.ya.ru/expert/" target="_blank" class="Link" style="font-weight:900; color:#00ff88;">NLP/NLU</a>‑анализа структурированных форензик‑репозиториев на GitVerse, выполняемый на суперкомпьютере <a href="https://cloud.ru/mlspace/christofari-neo" target="_blank" class="Link" style="font-weight:900; color:#00ff88;">Christofari Neo</a>.
+                </p>
+                <ul class="list-style-none f6 color-fg-muted">
+                  <li class="d-flex flex-items-center mb-1">
+                    📄 <span class="ml-2">Case README</span>
+                  </li>
+                  <li class="d-flex flex-items-center mb-1">
+                    🧠 <span class="ml-2">AI pipeline: <a href="https://habr.com/ru/companies/sberdevices/articles/968904/" target="_blank" class="Link" style="color:#00ff88;">GigaChat</a> 3 Ultra, <a href="https://yandex.cloud/ru/ai-models" target="_blank" class="Link" style="color:#ff5555;">Yandex</a>GPT 5.1 Pro, <a href="https://yandex.cloud/ru/ai-models" target="_blank" class="Link" style="color:#ff5555;">Яндекс</a> <a href="https://neurolegal.ya.ru/expert" target="_blank" class="Link" style="color:violet;">Нейроюрист</a></span>
+                  </li>
+                  <li class="d-flex flex-items-center mb-1">
+                    🧾 <span class="ml-2">Traceable legal reports</span>
+                  </li>
+                  <li class="d-flex flex-items-center mb-1">
+                    ⭐ <span class="ml-2">0 stars</span>
+                  </li>
+                  <li class="d-flex flex-items-center mb-1">
+                    👀 <span class="ml-2">0 watching</span>
+                  </li>
+                  <li class="d-flex flex-items-center mb-1">
+                    🍴 <span class="ml-2">0 forks</span>
+                  </li>
+                </ul>
+                <p class="f6 color-fg-muted mt-2 mb-0">
+                  <a href="#" class="Link">Report case or data issue</a>
+                </p>
+              </div>
+            </div>
+
+            <!-- Releases -->
+            <div class="Box mb-3">
+              <div class="Box-header">
+                <strong>Releases</strong>
+                <svg aria-hidden="true" height="16" viewBox="0 0 16 16" version="1.1" width="16" data-view-component="true" class="octicon octicon-tag float-right color-fg-success">
+                  <path d="M1 7.775V2.75C1 1.784 1.784 1 2.75 1h5.025c.464 0 .91.184 1.238.513l6.25 6.25a1.75 1.75 0 0 1 0 2.474l-5.026 5.026a1.75 1.75 0 0 1-2.474 0l-6.25-6.25A1.752 1.752 0 0 1 1 7.775Zm1.5 0c0 .066.026.13.073.177l6.25 6.25a.25.25 0 0 0 .354 0l5.025-5.025a.25.25 0 0 0 0-.354l-6.25-6.25a.25.25 0 0 0-.177-.073H2.75a.25.25 0 0 0-.25.25ZM6 5a1 1 0 1 1 0 2 1 1 0 0 1 0-2Z"></path>
+                </svg>
+              </div>
+              <div class="Box-body">
+                <p class="f6 color-fg-muted mb-1">No public case snapshots</p>
+                <a href="#" class="Link f6">Create first snapshot</a>
+              </div>
+            </div>
+
+            <!-- Packages -->
+            <div class="Box">
+              <div class="Box-header">
+                <strong>Pipelines</strong>
+                <svg text="gray" aria-hidden="true" height="16" viewBox="0 0 16 16" version="1.1" width="16" data-view-component="true" class="octicon octicon-pulse float-right">
+                  <path d="M6 2c.306 0 .582.187.696.471L10 10.731l1.304-3.26A.751.751 0 0 1 12 7h3.25a.75.75 0 0 1 0 1.5h-2.742l-1.812 4.528a.751.751 0 0 1-1.392 0L6 4.77 4.696 8.03A.75.75 0 0 1 4 8.5H.75a.75.75 0 0 1 0-1.5h2.742l1.812-4.529A.751.751 0 0 1 6 2Z"></path>
+                </svg>
+              </div>
+              <div class="Box-body">
+                <p class="f6 color-fg-muted mb-1">No reusable pipeline packages published</p>
+                <a href="#" class="Link f6">Publish pipeline.ai.yml as template</a>
+              </div>
+            </div>
+          </aside>
+        </div>
+      </div>
+    </main>
+  </body>
+  </html>

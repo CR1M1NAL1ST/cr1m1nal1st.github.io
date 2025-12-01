@@ -6,70 +6,28 @@
     <title>Цифровой Криминалист – Шаблон дела № 2037</title>
 
     <!-- Primer CSS по CDN -->
-    <link
-      rel="stylesheet"
-      href="https://unpkg.com/@primer/css@^20.2.4/dist/primer.css"
-    >
+    <link rel="stylesheet" href="https://unpkg.com/@primer/css@^20.2.4/dist/primer.css">
 
     <style>
-      body {
-        margin: 0;
-      }
-
-      .repo-shell {
-        max-width: 1280px;
-        margin: 0 auto;
-      }
-
-      .app-header {
-        position: relative;
-        z-index: 10;
-      }
-
-      .repo-main-layout {
-        display: flex;
-        align-items: flex-start;
-        gap: 1.5rem;
-      }
-
-      .repo-main {
-        flex: 1 1 auto;
-        min-width: 0;
-      }
-
-            .repo-aside {
-        width: 280px;
-        flex-shrink: 0;
-      }
-
-      .repo-main .Box-row .Link {
-        color: #ffffff;
-      }
-
-      a {
-        font-weight: 600;
-      }
-
+      body {margin: 0;}
+      .repo-shell {max-width: 1280px;margin: 0 auto;}
+      .app-header {position: relative;z-index: 10;}
+      .repo-main-layout {display: flex;align-items: flex-start;gap: 1.5rem;}
+      .repo-main {flex: 1 1 auto;min-width: 0;}
+      .repo-aside {width: 280px;flex-shrink: 0;}
+      .repo-main .Box-row .Link {color: #ffffff;}
+      a {font-weight: 600;}
       .readme-wrapper {
         /* лёгкое отделение шаблона структуры от листинга */
       }
-
       @media (max-width: 1012px) {
-        .repo-main-layout {
-          flex-direction: column;
-        }
-
-        .repo-aside {
-          width: 100%;
-        }
+        .repo-main-layout {flex-direction: column;}
+        .repo-aside {width: 100%;}
       }
     </style>
   </head>
 
   <body class="color-bg-canvas color-fg-default">
-
-    <!-- 1. App header -->
-        <!-- 1. App header -->
     <header class="app-header color-bg-subtle border-bottom px-3 py-2">
       <div class="repo-shell d-flex flex-items-center">
         <svg style="fill: white;" xmlns="http://www.w3.org/2000/svg" width="148" height="12.58" fill="none" viewBox="0 0 148 12.58" class="hidden xl:block"><defs> 
@@ -89,11 +47,9 @@
       </div>
     </header>
 
-    <!-- 2. Repo header + nav + main layout -->
     <main class="px-3 pt-3 pb-6">
       <div class="repo-shell">
 
-        <!-- Context region: owner / repo + Public -->
         <div class="d-flex flex-items-center flex-justify-between mb-2">
           <div class="d-flex flex-items-center">
             <a href="#" class="Link text-semibold mr-1">GitVerse</a>
@@ -135,13 +91,10 @@
           </div>
         </nav>
 
-        <!-- Split layout: main + aside -->
         <div class="repo-main-layout">
 
-          <!-- Левая колонка -->
           <section class="repo-main">
 
-            <!-- Строка ветки и действий -->
             <div class="d-flex flex-items-center flex-justify-between mb-2">
               <div class="d-flex flex-items-center text-small color-fg-muted">
                 <span class="color-fg-default text-semibold mr-2">main</span>
@@ -159,7 +112,6 @@
               </div>
             </div>
 
-            <!-- Box с файлами -->
             <div class="Box Box--condensed mb-3">
               <div class="Box-header d-flex flex-items-center">
                 <span class="text-small color-fg-muted">
@@ -168,7 +120,6 @@
                 </span>
               </div>
 
-              <!-- Директории сверху -->
               <div class="Box-row d-flex flex-items-center">
                 <span class="mr-2 color-fg-muted" aria-hidden="true">
   <svg aria-hidden="true" focusable="false" class="octicon octicon-file-directory-fill DirectoryRow-module__Octicon--_lwmM" viewBox="0 0 16 16" width="16" height="16" fill="currentColor" display="inline-block" overflow="visible" style="vertical-align: text-bottom;"><path d="M1.75 1A1.75 1.75 0 0 0 0 2.75v10.5C0 14.216.784 15 1.75 15h12.5A1.75 1.75 0 0 0 16 13.25v-8.5A1.75 1.75 0 0 0 14.25 3H7.5a.25.25 0 0 1-.2-.1l-.9-1.2C6.07 1.26 5.55 1 5 1H1.75Z"></path></svg>
@@ -377,10 +328,7 @@
             </div>
           </section>
 
-          <!-- Правая колонка -->
           <aside class="repo-aside">
-
-            <!-- About -->
             <div class="Box mb-3">
               <div class="Box-header">
                 <strong>About</strong>
@@ -418,7 +366,6 @@
               </div>
             </div>
 
-            <!-- Releases -->
             <div class="Box mb-3">
               <div class="Box-header">
                 <strong>Releases</strong>
@@ -432,7 +379,6 @@
               </div>
             </div>
 
-            <!-- Packages -->
             <div class="Box">
               <div class="Box-header">
                 <strong>Pipelines</strong>

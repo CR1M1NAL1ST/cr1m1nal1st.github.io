@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html lang="ru" data-color-mode="dark" data-dark-theme="dark">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>cr1m1nal1st.github.io – GitHub-style mock</title>
+
+    <!-- Primer CSS по CDN -->
+    <link
+      rel="stylesheet"
+      href="https://unpkg.com/@primer/css@^20.2.4/dist/primer.css"
+    >
+
+    <style>
+      body {
+        margin: 0;
+      }
+
+      .repo-shell {
+        max-width: 1280px;
+        margin: 0 auto;
+      }
+
+      .app-header {
+        position: relative;
+        z-index: 10;
+      }
+
+      .repo-main-layout {
+        display: flex;
+        align-items: flex-start;
+        gap: 1.5rem;
+      }
+
+      .repo-main {
+        flex: 1 1 auto;
+        min-width: 0;
+      }
+
+      .repo-aside {
+        width: 280px;
+        flex-shrink: 0;
+      }
+
+      @media (max-width: 1012px) {
+        .repo-main-layout {
+          flex-direction: column;
+        }
+
+        .repo-aside {
+          width: 100%;
+        }
+      }
+    </style>
+  </head>
+
+  <body class="color-bg-canvas color-fg-default">
+
+    <!-- 1. App header -->
+    <header class="app-header color-bg-subtle border-bottom px-3 py-2">
+      <div class="repo-shell d-flex flex-items-center flex-justify-between">
+        <div class="d-flex flex-items-center">
+          <span class="f4 text-bold mr-3">GitHub</span>
+
+          <nav class="d-none d-md-flex flex-items-center text-small color-fg-muted">
+            <a href="#" class="mr-3 Link">Code</a>
+            <a href="#" class="mr-3 Link">Issues</a>
+            <a href="#" class="mr-3 Link">Pull requests</a>
+            <a href="#" class="mr-3 Link">Actions</a>
+            <a href="#" class="mr-3 Link">Projects</a>
+            <a href="#" class="mr-3 Link">Security</a>
+            <a href="#" class="mr-3 Link">Insights</a>
+          </nav>
+        </div>
+
+        <div class="d-flex flex-items-center">
+          <button class="btn btn-sm mr-2 text-small">
+            Search or jump to…
+          </button>
+          <button class="btn btn-sm mr-2 text-small">Sign in</button>
+          <button class="btn btn-sm btn-primary text-small">Sign up</button>
+        </div>
+      </div>
+    </header>
+
+    <!-- 2. Repo header + nav + main layout -->
+    <main class="px-3 pt-3 pb-6">
+      <div class="repo-shell">
+
+        <!-- Context region: owner / repo + Public -->
+        <div class="d-flex flex-items-center flex-justify-between mb-2">
+          <div class="d-flex flex-items-center">
+            <a href="#" class="Link text-semibold mr-1">CR1M1NAL1ST</a>
+            <span class="color-fg-muted mr-1">/</span>
+            <strong class="text-bold mr-2">cr1m1nal1st.github.io</strong>
+            <span class="Label Label--secondary">Public</span>
+          </div>
+
+          <div class="d-flex flex-items-center">
+            <button class="btn btn-sm mr-2">
+              Watch <span class="Counter ml-1">0</span>
+            </button>
+            <button class="btn btn-sm mr-2">
+              Fork <span class="Counter ml-1">0</span>
+            </button>
+            <button class="btn btn-sm btn-primary">
+              Star <span class="Counter ml-1">0</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- UnderlineNav -->
+        <nav class="UnderlineNav UnderlineNav--full mb-3" aria-label="Repository navigation">
+          <div class="UnderlineNav-body">
+            <a class="UnderlineNav-item" aria-current="page" href="#">Code</a>
+            <a class="UnderlineNav-item" href="#">Issues</a>
+            <a class="UnderlineNav-item" href="#">Pull requests</a>
+            <a class="UnderlineNav-item" href="#">Actions</a>
+            <a class="UnderlineNav-item" href="#">Projects</a>
+            <a class="UnderlineNav-item" href="#">Security</a>
+            <a class="UnderlineNav-item" href="#">Insights</a>
+          </div>
+        </nav>
+
+        <!-- Split layout: main + aside -->
+        <div class="repo-main-layout">
+
+          <!-- Левая колонка -->
+          <section class="repo-main">
+
+            <!-- Строка ветки и действий -->
+            <div class="d-flex flex-items-center flex-justify-between mb-2">
+              <div class="d-flex flex-items-center text-small color-fg-muted">
+                <span class="color-fg-default text-semibold mr-2">main</span>
+                <span class="mr-2">1 branch</span>
+                <span>0 tags</span>
+              </div>
+
+              <div class="d-flex flex-items-center">
+                <button class="btn btn-sm mr-2">Go to file</button>
+                <button class="btn btn-sm mr-2">Add file</button>
+                <button class="btn btn-sm btn-primary">
+                  Code
+                  <span aria-hidden="true">▾</span>
+                </button>
+              </div>
+            </div>
+
+            <!-- Box с файлами -->
+            <div class="Box Box--condensed">
+              <div class="Box-header d-flex flex-items-center">
+                <span class="text-small color-fg-muted">
+                  <span class="text-bold mr-1">CEPBEP</span>
+                  Update README.md · 44 minutes ago · 22 commits
+                </span>
+              </div>
+
+              <div class="Box-row d-flex flex-items-center">
+                <span class="mr-2 color-fg-muted">📄</span>
+                <a href="#" class="Link flex-auto">README.md</a>
+                <span class="text-small color-fg-muted mr-2">
+                  Update README.md
+                </span>
+                <span class="text-small color-fg-muted">44 minutes ago</span>
+              </div>
+
+              <div class="Box-row d-flex flex-items-center">
+                <span class="mr-2 color-fg-muted">📄</span>
+                <a href="#" class="Link flex-auto">index.html</a>
+                <span class="text-small color-fg-muted mr-2">
+                  Update index.html
+                </span>
+                <span class="text-small color-fg-muted">54 minutes ago</span>
+              </div>
+
+              <div class="Box-row d-flex flex-items-center">
+                <span class="mr-2 color-fg-muted">📄</span>
+                <a href="#" class="Link flex-auto">index2.html</a>
+                <span class="text-small color-fg-muted mr-2">
+                  Update index2.html
+                </span>
+                <span class="text-small color-fg-muted">53 minutes ago</span>
+              </div>
+            </div>
+
+            <!-- README блок -->
+            <div class="mt-3">
+              <div class="Box">
+                <div class="Box-header">
+                  <strong>README</strong>
+                </div>
+                <div class="Box-body">
+                  <h1 class="f2 text-normal mb-2">Название репозитория</h1>
+                </div>
+              </div>
+            </div>
+          </section>
+
+          <!-- Правая колонка -->
+          <aside class="repo-aside">
+
+            <!-- About -->
+            <div class="Box mb-3">
+              <div class="Box-header">
+                <strong>About</strong>
+              </div>
+              <div class="Box-body">
+                <p class="f6 color-fg-muted mb-2">
+                  No description, website, or topics provided.
+                </p>
+                <ul class="list-style-none f6 color-fg-muted">
+                  <li class="d-flex flex-items-center mb-1">
+                    📄 <span class="ml-2">Readme</span>
+                  </li>
+                  <li class="d-flex flex-items-center mb-1">
+                    📈 <span class="ml-2">Activity</span>
+                  </li>
+                  <li class="d-flex flex-items-center mb-1">
+                    ⚙️ <span class="ml-2">Custom properties</span>
+                  </li>
+                  <li class="d-flex flex-items-center mb-1">
+                    ⭐ <span class="ml-2">0 stars</span>
+                  </li>
+                  <li class="d-flex flex-items-center mb-1">
+                    👀 <span class="ml-2">0 watching</span>
+                  </li>
+                  <li class="d-flex flex-items-center mb-1">
+                    🍴 <span class="ml-2">0 forks</span>
+                  </li>
+                </ul>
+                <p class="f6 color-fg-muted mt-2 mb-0">
+                  <a href="#" class="Link">Report repository</a>
+                </p>
+              </div>
+            </div>
+
+            <!-- Releases -->
+            <div class="Box mb-3">
+              <div class="Box-header">
+                <strong>Releases</strong>
+              </div>
+              <div class="Box-body">
+                <p class="f6 color-fg-muted mb-1">No releases published</p>
+                <a href="#" class="Link f6">Create a new release</a>
+              </div>
+            </div>
+
+            <!-- Packages -->
+            <div class="Box">
+              <div class="Box-header">
+                <strong>Packages</strong>
+              </div>
+              <div class="Box-body">
+                <p class="f6 color-fg-muted mb-1">No packages published</p>
+                <a href="#" class="Link f6">Publish your first package</a>
+              </div>
+            </div>
+          </aside>
+        </div>
+      </div>
+    </main>
+  </body>
+</html>

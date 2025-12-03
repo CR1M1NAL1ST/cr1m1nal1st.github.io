@@ -1,0 +1,508 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <title>Git-таймлайн дела · Digital Forensic</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <style>
+    :root {
+      --bg: #020617;
+      --panel: #020617ee;
+      --border: rgba(148,163,184,0.5);
+      --text-main: #e5e7eb;
+      --text-dim: #9ca3af;
+      --accent-main: #38bdf8;
+      --accent-signal: #22d3ee;
+      --accent-nlp: #a855f7;
+      --accent-legal: #facc15;
+      --accent-osint: #f97316;
+      --accent-soc: #22c55e;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background:
+        radial-gradient(circle at top, rgba(56,189,248,0.22), transparent 55%),
+        radial-gradient(circle at bottom, rgba(129,140,248,0.16), transparent 55%),
+        var(--bg);
+      color: var(--text-main);
+      font-family: system-ui,-apple-system,BlinkMacSystemFont,"SF Pro Text",sans-serif;
+    }
+
+    .shell {
+      width: min(1120px, 100% - 32px);
+      border-radius: 24px;
+      border: 1px solid var(--border);
+      background: radial-gradient(circle at top left, rgba(37,99,235,0.3), transparent 60%),
+                  radial-gradient(circle at bottom right, rgba(8,47,73,0.8), transparent 65%),
+                  var(--panel);
+      box-shadow: 0 30px 60px rgba(15,23,42,0.9);
+      padding: 18px 20px 16px;
+      display: grid;
+      grid-template-columns: 2.3fr 1.4fr;
+      gap: 16px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .shell::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      background-image:
+        linear-gradient(rgba(30,64,175,0.18) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(30,64,175,0.18) 1px, transparent 1px);
+      background-size: 32px 32px;
+      opacity: .65;
+      mix-blend-mode: soft-light;
+      z-index: -1;
+    }
+
+    header {
+      grid-column: 1 / -1;
+      margin-bottom: 6px;
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      gap: 12px;
+    }
+
+    .title {
+      font-size: 0.75rem;
+      letter-spacing: .22em;
+      text-transform: uppercase;
+      color: var(--text-dim);
+    }
+    .subtitle {
+      font-size: 0.95rem;
+      margin-top: 4px;
+      color: var(--accent-main);
+    }
+    .hint {
+      font-size: 0.7rem;
+      color: var(--text-dim);
+      max-width: 260px;
+    }
+
+    /* левая колонка: таймлайн */
+    .timeline-block {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .timeline-frame {
+      border-radius: 18px;
+      border: 1px solid rgba(51,65,85,0.9);
+      background: radial-gradient(circle at top, rgba(15,23,42,0.95), rgba(15,23,42,0.96));
+      padding: 12px 14px 6px;
+    }
+
+    .timeline-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 0.72rem;
+      color: var(--text-dim);
+      margin-bottom: 6px;
+    }
+    .chip {
+      border-radius: 999px;
+      padding: 2px 8px;
+      border: 1px solid rgba(148,163,184,0.6);
+      text-transform: uppercase;
+      letter-spacing: .16em;
+      font-size: 0.65rem;
+    }
+
+    #gitTimeline {
+      width: 100%;
+      height: 120px;
+      display: block;
+    }
+
+    .legend {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 4px;
+      font-size: 0.68rem;
+      color: var(--text-dim);
+    }
+    .legend-item {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+    }
+    .dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 999px;
+    }
+
+    .tags-row {
+      margin-top: 8px;
+      display: flex;
+      gap: 6px;
+      justify-content: space-between;
+      align-items: stretch;
+      font-size: 0.7rem;
+    }
+    .commit-tag {
+      flex: 1 1 0;
+      min-width: 0;
+      border-radius: 999px;
+      border: 1px solid rgba(71,85,105,0.9);
+      padding: 4px 8px;
+      background: rgba(15,23,42,0.96);
+      color: var(--text-dim);
+      cursor: pointer;
+      display: flex;
+      flex-direction: column;
+      gap: 1px;
+      transition: border-color .15s ease, background .15s ease, color .15s ease, transform .15s ease;
+    }
+    .commit-tag-main {
+      display: flex;
+      justify-content: space-between;
+      gap: 6px;
+      font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+    }
+    .commit-tag-episode {
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+    .commit-tag-branch {
+      font-size: 0.62rem;
+      letter-spacing: .14em;
+      text-transform: uppercase;
+    }
+    .commit-tag.active {
+      border-color: var(--accent-main);
+      color: var(--text-main);
+      background: radial-gradient(circle at top, rgba(56,189,248,0.18), rgba(15,23,42,0.98));
+      transform: translateY(-1px);
+    }
+
+    /* правая колонка: детали коммита */
+    .detail-block {
+      border-radius: 18px;
+      border: 1px solid rgba(51,65,85,0.9);
+      background: radial-gradient(circle at top right, rgba(8,47,73,0.9), rgba(15,23,42,0.98));
+      padding: 12px 14px;
+      font-size: 0.8rem;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .detail-hash {
+      font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+      font-size: 0.75rem;
+      color: #a5b4fc;
+    }
+    .detail-title {
+      font-size: 0.95rem;
+      font-weight: 600;
+    }
+    .detail-branch {
+      font-size: 0.7rem;
+      text-transform: uppercase;
+      letter-spacing: .18em;
+      color: var(--text-dim);
+    }
+    .detail-body {
+      margin-top: 4px;
+      line-height: 1.5;
+      color: var(--text-main);
+    }
+
+    .metrics {
+      display: grid;
+      grid-template-columns: repeat(2,minmax(0,1fr));
+      gap: 6px;
+      margin-top: 6px;
+    }
+    .metric-pill {
+      border-radius: 999px;
+      border: 1px solid rgba(75,85,99,0.95);
+      padding: 4px 8px;
+      display: flex;
+      justify-content: space-between;
+      gap: 4px;
+      font-size: 0.7rem;
+      color: var(--text-dim);
+    }
+    .metric-pill span:last-child {
+      font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+      color: var(--accent-main);
+    }
+
+    @media (max-width: 900px) {
+      .shell {
+        grid-template-columns: 1fr;
+      }
+      .tags-row {
+        flex-wrap: wrap;
+      }
+    }
+  </style>
+</head>
+<body>
+<div class="shell">
+  <header>
+    <div>
+      <div class="title">git timeline · цифровая криминалистика</div>
+      <div class="subtitle">Эпизоды дела как коммиты ветки расследования</div>
+    </div>
+    <div class="hint">
+      Клик по кругу или тегу коммита — справа раскроется описание эпизода, ветка и оценка рисков.
+    </div>
+  </header>
+
+  <section class="timeline-block">
+    <div class="timeline-frame">
+      <div class="timeline-header">
+        <div class="chip">case timeline · git log</div>
+        <div class="legend">
+          <span class="legend-item"><span class="dot" style="background:var(--accent-signal)"></span>Сигналы / запись</span>
+          <span class="legend-item"><span class="dot" style="background:var(--accent-nlp)"></span>NLP / NLU</span>
+          <span class="legend-item"><span class="dot" style="background:var(--accent-osint)"></span>OSINT</span>
+          <span class="legend-item"><span class="dot" style="background:var(--accent-legal)"></span>Право</span>
+          <span class="legend-item"><span class="dot" style="background:var(--accent-soc)"></span>Соц.динамика</span>
+        </div>
+      </div>
+
+      <svg id="gitTimeline" viewBox="0 0 100 60" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+          <linearGradient id="timeLineGrad" x1="0" y1="0" x2="1" y2="0">
+            <stop offset="0" stop-color="#22d3ee" />
+            <stop offset="0.5" stop-color="#38bdf8" />
+            <stop offset="1" stop-color="#a855f7" />
+          </linearGradient>
+        </defs>
+
+        <!-- базовая линия времени -->
+        <path d="M 6 30 L 94 30" stroke="url(#timeLineGrad)" stroke-width="1.2"
+              stroke-linecap="round" />
+
+        <!-- точка для подписей осей -->
+        <text x="7" y="18" font-size="5" fill="#64748b" letter-spacing="1.2"
+              style="text-transform:uppercase;">t0…tn</text>
+        <text x="68" y="52" font-size="5" fill="#64748b" letter-spacing="1.2"
+              style="text-transform:uppercase;">эпизоды расследования →</text>
+
+        <g id="gitNodes"></g>
+      </svg>
+
+      <div id="tagRow" class="tags-row"></div>
+    </div>
+  </section>
+
+  <aside class="detail-block">
+    <div class="detail-hash" id="detailHash">commit —</div>
+    <div class="detail-title" id="detailTitle">Выберите коммит на таймлайне</div>
+    <div class="detail-branch" id="detailBranch">ветка: —</div>
+    <div class="detail-body" id="detailBody">
+      Здесь появится описание эпизода: что произошло, какие цифровые артефакты были зафиксированы,
+      как это связано с другими эпизодами и какую роль играет в общей доказательной конструкции.
+    </div>
+    <div class="metrics">
+      <div class="metric-pill"><span>Целостность следа</span><span id="mIntegrity">—</span></div>
+      <div class="metric-pill"><span>Трассируемость</span><span id="mTrace">—</span></div>
+      <div class="metric-pill"><span>AI-анализ</span><span id="mAI">—</span></div>
+      <div class="metric-pill"><span>Риск-индекс</span><span id="mRisk">—</span></div>
+    </div>
+  </aside>
+</div>
+
+<script>
+  // === ДАННЫЕ ЭПИЗОДОВ КАК КОММИТОВ ===
+  const episodes = [
+    {
+      id: 'ep0_context',
+      hash: 'a1c0f0',
+      t: 'T0',
+      label: 'Создание контура наблюдения',
+      branch: 'signal',
+      branchLabel: 'capture / monitoring',
+      desc: 'Формируется базовый контур: чаты, созвоны, цифровые каналы. Фиксируются первые сообщения о «мониторинге мыслей» и контроля окружения со стороны группы.',
+      metrics: { integrity: '★★★☆☆', trace: '★★★☆☆', ai: '—', risk: '●●○' }
+    },
+    {
+      id: 'ep1_threats',
+      hash: 'c3e7b2',
+      t: 'T+1',
+      label: 'Угрозы и эскалация',
+      branch: 'soc',
+      branchLabel: 'social · threats',
+      desc: 'В переписке появляются прямые угрозы причинения вреда («найди и убей», «сломаю ноги»). Фиксируется переход от «игрового» общения к психологическому давлению.',
+      metrics: { integrity: '★★★★☆', trace: '★★★★☆', ai: '★☆☆☆☆', risk: '●●●●' }
+    },
+    {
+      id: 'ep2_osint',
+      hash: 'd4f9a1',
+      t: 'T+2',
+      label: 'Нелегальный OSINT-пробив',
+      branch: 'osint',
+      branchLabel: 'osint / data',
+      desc: 'Сбор персональных и финансовых данных по запросу третьих лиц. Участники признают вторжение в «личные данные» и «пробив клиентов», что повышает юридические риски.',
+      metrics: { integrity: '★★★★★', trace: '★★★★☆', ai: '★★☆☆☆', risk: '●●●●●' }
+    },
+    {
+      id: 'ep3_blueprints',
+      hash: 'e8b2d9',
+      t: 'T+3',
+      label: 'Интерес к чертежам техники',
+      branch: 'legal',
+      branchLabel: 'legal · sensitive objects',
+      desc: 'Появляется устойчивый интерес к чертежам стратегической техники и инфраструктуры. Потенциально затрагиваются режимные объекты и вопросы гостайны / шпионажа.',
+      metrics: { integrity: '★★★☆☆', trace: '★★★☆☆', ai: '★★★☆☆', risk: '●●●●' }
+    },
+    {
+      id: 'ep4_religion',
+      hash: 'f0a7cd',
+      t: 'T+4',
+      label: 'Оскорбление религиозных чувств',
+      branch: 'soc',
+      branchLabel: 'social · religion',
+      desc: 'Используется ник и высказывания, унижающие религиозные чувства верующих. Эпизод может быть сопоставлен с нормами об оскорблении чувств верующих в зависимости от контекста.',
+      metrics: { integrity: '★★★★☆', trace: '★★★☆☆', ai: '★☆☆☆☆', risk: '●●●' }
+    },
+    {
+      id: 'ep5_ethnic',
+      hash: 'a9c4ee',
+      t: 'T+5',
+      label: 'Этническая риторика в период СВО',
+      branch: 'soc',
+      branchLabel: 'social · hate speech',
+      desc: 'В коммуникации фиксируются обобщающие высказывания в адрес национальной группы в условиях геополитической напряжённости. Важен контекст для оценки разжигания ненависти.',
+      metrics: { integrity: '★★★☆☆', trace: '★★★☆☆', ai: '★★☆☆☆', risk: '●●●' }
+    }
+  ];
+
+  function branchColor(branch) {
+    switch (branch) {
+      case 'signal': return getComputedStyle(document.documentElement)
+        .getPropertyValue('--accent-signal') || '#22d3ee';
+      case 'nlp': return getComputedStyle(document.documentElement)
+        .getPropertyValue('--accent-nlp') || '#a855f7';
+      case 'osint': return getComputedStyle(document.documentElement)
+        .getPropertyValue('--accent-osint') || '#f97316';
+      case 'legal': return getComputedStyle(document.documentElement)
+        .getPropertyValue('--accent-legal') || '#facc15';
+      case 'soc': return getComputedStyle(document.documentElement)
+        .getPropertyValue('--accent-soc') || '#22c55e';
+      default: return '#38bdf8';
+    }
+  }
+
+  const svg = document.getElementById('gitTimeline');
+  const nodesGroup = document.getElementById('gitNodes');
+  const tagRow = document.getElementById('tagRow');
+  const svgNS = 'http://www.w3.org/2000/svg';
+
+  // === построение SVG-узлов ===
+  episodes.forEach((ep, idx) => {
+    const total = episodes.length - 1 || 1;
+    const cx = 6 + (idx / total) * 88;
+    const cy = 30;
+    const color = branchColor(ep.branch);
+
+    const stem = document.createElementNS(svgNS, 'line');
+    stem.setAttribute('x1', cx);
+    stem.setAttribute('y1', cy - 10);
+    stem.setAttribute('x2', cx);
+    stem.setAttribute('y2', cy + 10);
+    stem.setAttribute('stroke', 'rgba(148,163,184,0.85)');
+    stem.setAttribute('stroke-width', '0.6');
+    stem.setAttribute('stroke-dasharray', '2 2');
+    nodesGroup.appendChild(stem);
+
+    const outer = document.createElementNS(svgNS, 'circle');
+    outer.setAttribute('cx', cx);
+    outer.setAttribute('cy', cy);
+    outer.setAttribute('r', '3.5');
+    outer.setAttribute('fill', '#020617');
+    outer.setAttribute('stroke', color);
+    outer.setAttribute('stroke-width', '1.4');
+    nodesGroup.appendChild(outer);
+
+    const inner = document.createElementNS(svgNS, 'circle');
+    inner.setAttribute('cx', cx);
+    inner.setAttribute('cy', cy);
+    inner.setAttribute('r', '1.8');
+    inner.setAttribute('fill', color);
+    inner.dataset.id = ep.id;
+    inner.style.cursor = 'pointer';
+    nodesGroup.appendChild(inner);
+
+    const label = document.createElementNS(svgNS, 'text');
+    label.setAttribute('x', cx);
+    label.setAttribute('y', cy - 13);
+    label.setAttribute('fill', '#cbd5f5');
+    label.setAttribute('font-size', '5');
+    label.setAttribute('text-anchor', 'middle');
+    label.textContent = ep.t;
+    nodesGroup.appendChild(label);
+
+    inner.addEventListener('click', () => selectEpisode(ep.id));
+  });
+
+  // === теги под каждым эпизодом ===
+  episodes.forEach((ep) => {
+    const tag = document.createElement('button');
+    tag.className = 'commit-tag';
+    tag.dataset.id = ep.id;
+    tag.innerHTML = `
+      <div class="commit-tag-main">
+        <span>${ep.hash}</span>
+        <span class="commit-tag-episode">${ep.label}</span>
+      </div>
+      <div class="commit-tag-branch">${ep.branchLabel}</div>
+    `;
+    tag.addEventListener('click', () => selectEpisode(ep.id));
+    tagRow.appendChild(tag);
+  });
+
+  // === правая панель ===
+  const detailHash = document.getElementById('detailHash');
+  const detailTitle = document.getElementById('detailTitle');
+  const detailBranch = document.getElementById('detailBranch');
+  const detailBody = document.getElementById('detailBody');
+  const mIntegrity = document.getElementById('mIntegrity');
+  const mTrace = document.getElementById('mTrace');
+  const mAI = document.getElementById('mAI');
+  const mRisk = document.getElementById('mRisk');
+
+  function selectEpisode(id) {
+    const ep = episodes.find(e => e.id === id);
+    if (!ep) return;
+
+    detailHash.textContent = `commit ${ep.hash}`;
+    detailTitle.textContent = ep.label;
+    detailBranch.textContent = `ветка: ${ep.branchLabel}`;
+    detailBody.textContent = ep.desc;
+    mIntegrity.textContent = ep.metrics.integrity;
+    mTrace.textContent = ep.metrics.trace;
+    mAI.textContent = ep.metrics.ai;
+    mRisk.textContent = ep.metrics.risk;
+
+    document.querySelectorAll('.commit-tag').forEach(tag => {
+      tag.classList.toggle('active', tag.dataset.id === id);
+    });
+  }
+
+  // стартовое состояние
+  selectEpisode(episodes[0].id);
+</script>
+</body>
+</html>

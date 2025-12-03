@@ -1,0 +1,608 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <title>Blueprint GIT · Цифровые доказательства</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <style>
+    :root {
+      --bg: #020617;
+      --panel: rgba(15,23,42,0.92);
+      --border: rgba(148,163,184,0.45);
+      --text-main: #e5e7eb;
+      --text-dim: #9ca3af;
+      --accent-main: #38bdf8;
+      --accent-nlp: #a855f7;
+      --accent-legal: #facc15;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      font-family: system-ui,-apple-system,BlinkMacSystemFont,"SF Pro Text",sans-serif;
+      background:
+        radial-gradient(circle at top, rgba(56,189,248,0.16), transparent 55%),
+        radial-gradient(circle at bottom, rgba(129,140,248,0.18), transparent 55%),
+        var(--bg);
+      color: var(--text-main);
+      display: flex;
+      align-items: stretch;
+      justify-content: center;
+    }
+
+    .app {
+      width: 100%;
+      max-width: 1400px;
+      margin: 16px;
+      display: grid;
+      grid-template-columns: 2.4fr 1.2fr;
+      gap: 16px;
+      position: relative;
+    }
+
+    /* глобальный blueprint-grid */
+    .app::before {
+      content: "";
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      background-image:
+        linear-gradient(rgba(30,64,175,0.21) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(30,64,175,0.18) 1px, transparent 1px);
+      background-size: 40px 40px;
+      opacity: 0.55;
+      mix-blend-mode: soft-light;
+      z-index: -1;
+    }
+
+    header {
+      grid-column: 1 / -1;
+      padding: 10px 14px 4px;
+      border-radius: 18px;
+      background: linear-gradient(to right, #020617, #020617d0);
+      border: 1px solid rgba(51,65,85,0.9);
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      gap: 12px;
+    }
+
+    .title {
+      text-transform: uppercase;
+      letter-spacing: .25em;
+      font-size: 0.7rem;
+      color: var(--text-dim);
+    }
+    .subtitle {
+      font-size: 0.85rem;
+      color: var(--accent-main);
+    }
+
+    .hint {
+      font-size: 0.68rem;
+      color: var(--text-dim);
+    }
+
+    .panel {
+      border-radius: 24px;
+      background: var(--panel);
+      border: 1px solid var(--border);
+      box-shadow: 0 18px 40px rgba(15,23,42,0.8);
+      overflow: hidden;
+      position: relative;
+    }
+
+    /* ЛЕВАЯ: граф */
+    .graph-panel {
+      padding: 14px 16px 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .graph-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 0.75rem;
+      color: var(--text-dim);
+    }
+
+    .chip {
+      border-radius: 999px;
+      border: 1px solid rgba(148,163,184,0.6);
+      padding: 3px 10px;
+      font-size: 0.65rem;
+      text-transform: uppercase;
+      letter-spacing: .18em;
+      color: var(--text-dim);
+    }
+
+    .legend {
+      display: flex;
+      gap: 12px;
+      font-size: 0.68rem;
+    }
+    .legend-item {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+    }
+    .legend-dot {
+      width: 9px;
+      height: 9px;
+      border-radius: 999px;
+    }
+
+    #graphWrapper {
+      flex: 1;
+      border-radius: 18px;
+      border: 1px solid rgba(51,65,85,0.9);
+      background: radial-gradient(circle at top left, rgba(15,118,110,0.2), transparent 55%);
+      position: relative;
+      overflow: hidden;
+    }
+
+    /* локальная тонкая сетка под SVG */
+    #graphWrapper::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background-image:
+        linear-gradient(rgba(30,64,175,0.22) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(30,64,175,0.18) 1px, transparent 1px);
+      background-size: 24px 24px;
+      opacity: .5;
+      mix-blend-mode: screen;
+      pointer-events: none;
+    }
+
+    svg#gitGraph {
+      width: 100%;
+      height: 100%;
+      display: block;
+    }
+
+    .axis-label {
+      font-size: 10px;
+      fill: #64748b;
+      text-transform: uppercase;
+      letter-spacing: .16em;
+    }
+
+    /* ПРАВАЯ: карточка коммита + структура дела */
+    .side-panel {
+      display: flex;
+      flex-direction: column;
+      padding: 14px 16px 16px;
+      gap: 10px;
+      font-size: 0.8rem;
+    }
+
+    .commit-meta {
+      border-radius: 16px;
+      border: 1px solid rgba(75,85,99,0.9);
+      padding: 10px 12px;
+      background: radial-gradient(circle at top, rgba(56,189,248,0.12), transparent 65%);
+    }
+
+    .commit-id {
+      font-family: "SF Mono",ui-monospace,Menlo,monospace;
+      font-size: 0.74rem;
+      color: #a5b4fc;
+    }
+    .commit-title {
+      margin-top: 4px;
+      font-size: 0.9rem;
+      font-weight: 600;
+      color: var(--text-main);
+    }
+    .tagline {
+      margin-top: 3px;
+      font-size: 0.72rem;
+      text-transform: uppercase;
+      letter-spacing: .16em;
+      color: var(--text-dim);
+    }
+
+    .commit-body {
+      margin-top: 8px;
+      font-size: 0.78rem;
+      color: var(--text-main);
+      line-height: 1.5;
+    }
+
+    .props-grid {
+      display: grid;
+      grid-template-columns: repeat(2,minmax(0,1fr));
+      gap: 6px;
+      margin-top: 10px;
+    }
+    .pill {
+      border-radius: 999px;
+      border: 1px solid rgba(148,163,184,0.45);
+      padding: 4px 8px;
+      font-size: 0.7rem;
+      color: var(--text-dim);
+      display: flex;
+      justify-content: space-between;
+      gap: 4px;
+    }
+    .pill span:last-child {
+      color: var(--accent-main);
+      font-family: ui-monospace,Menlo,monospace;
+    }
+
+    .case-structure {
+      flex: 1;
+      border-radius: 18px;
+      border: 1px dashed rgba(75,85,99,0.85);
+      padding: 10px 12px;
+      margin-top: 2px;
+      font-size: 0.76rem;
+      color: var(--text-dim);
+      overflow: auto;
+    }
+
+    .case-structure ul {
+      list-style: none;
+      padding-left: 0;
+      margin: 4px 0 0;
+    }
+    .case-structure li::before {
+      content: "├";
+      margin-right: 6px;
+      color: #475569;
+    }
+    .case-structure li {
+      margin: 1px 0;
+    }
+    .case-structure li span {
+      color: var(--text-main);
+    }
+
+    .footer-hint {
+      font-size: 0.66rem;
+      margin-top: 6px;
+      color: #6b7280;
+    }
+
+    /* responsive */
+    @media (max-width: 960px) {
+      .app {
+        grid-template-columns: 1fr;
+      }
+      header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 6px;
+      }
+    }
+  </style>
+</head>
+<body>
+<div class="app">
+  <header>
+    <div>
+      <div class="title">digital forensic · git case blueprint</div>
+      <div class="subtitle">Структурированное хранение цифровых доказательств в системе контроля версий</div>
+    </div>
+    <div class="hint">
+      Клик по коммиту → показать этап работы с доказательствами и его процессуальный смысл.
+    </div>
+  </header>
+
+  <!-- ЛЕВЫЙ БЛОК: визуальный git-граф -->
+  <section class="panel graph-panel">
+    <div class="graph-header">
+      <div class="chip">GIT-граф дела · ветки и коммиты</div>
+      <div class="legend">
+        <div class="legend-item">
+          <span class="legend-dot" style="background:#38bdf8;"></span><span>evidence / main</span>
+        </div>
+        <div class="legend-item">
+          <span class="legend-dot" style="background:#a855f7;"></span><span>NLP / NLU</span>
+        </div>
+        <div class="legend-item">
+          <span class="legend-dot" style="background:#facc15;"></span><span>legal / нейроюрист</span>
+        </div>
+      </div>
+    </div>
+
+    <div id="graphWrapper">
+      <svg id="gitGraph" viewBox="0 0 900 520" xmlns="http://www.w3.org/2000/svg">
+        <!-- оси времени и слоёв -->
+        <text x="24" y="36" class="axis-label">layers</text>
+        <text x="840" y="498" class="axis-label">timeline →</text>
+      </svg>
+    </div>
+  </section>
+
+  <!-- ПРАВЫЙ БЛОК: описание выбранного коммита + структура дела -->
+  <aside class="panel side-panel">
+    <div class="commit-meta" id="commitMeta">
+      <div class="commit-id" id="commitId">commit —</div>
+      <div class="commit-title" id="commitTitle">Выберите коммит на графе</div>
+      <div class="tagline" id="commitBranch">ветка: —</div>
+      <div class="commit-body" id="commitBody">
+        Здесь появится расшифровка этапа: что делали с цифровыми артефактами,
+        какие сущности менялись и как это влияет на допустимость и целостность доказательств.
+      </div>
+      <div class="props-grid">
+        <div class="pill"><span>Целостность</span><span id="pillIntegrity">—</span></div>
+        <div class="pill"><span>Трассируемость</span><span id="pillTrace">—</span></div>
+        <div class="pill"><span>AI-анализ</span><span id="pillAI">—</span></div>
+        <div class="pill"><span>Юр.риски</span><span id="pillRisk">—</span></div>
+      </div>
+    </div>
+
+    <div class="case-structure">
+      <div style="font-size:0.7rem;text-transform:uppercase;letter-spacing:.16em;margin-bottom:2px;">
+        skeleton · case repository
+      </div>
+      <ul>
+        <li><span>raw/</span> — сырые аудио, видео, скрины, переписка</li>
+        <li><span>metadata/</span> — индексы артефактов и метаданные</li>
+        <li><span>text-layer/</span> — расшифровки и нормализованные диалоги</li>
+        <li><span>ai-nlp-nlu/</span> — выводы GigaChat / YandexGPT</li>
+        <li><span>embeddings/</span> — векторные представления для поиска</li>
+        <li><span>legal/</span> — нейроюрист, квалификация, отчёты</li>
+        <li><span>docs/</span> — chain-of-custody, методики, логи пайплайна</li>
+      </ul>
+      <div class="footer-hint">
+        Каждый коммит фиксирует не только изменение файлов, но и состояние
+        цепочки хранения и набора экспертиз по делу.
+      </div>
+    </div>
+  </aside>
+</div>
+
+<script>
+  // --------- ДАННЫЕ GIT-ГРАФА ---------
+  // Условная шкала X (время) и три уровня Y (слои пайплайна)
+  const BRANCH_Y = {
+    evidence: 140,
+    nlp: 260,
+    legal: 380
+  };
+
+  const commits = [
+    {
+      id: "c0a1e0",
+      short: "T0",
+      branch: "evidence",
+      x: 90,
+      title: "Импорт сырых цифровых артефактов",
+      body:
+        "В репозиторий попадают сырые записи: переписка, медиа, логи устройств. " +
+        "Закладывается исходная точка цепочки хранения; хэш-снимок фиксирует стартовое состояние.",
+      metrics: { integrity: "★★★☆☆", trace: "★★★☆☆", ai: "—", risk: "●●○" }
+    },
+    {
+      id: "c1b2e3",
+      short: "T+1",
+      branch: "evidence",
+      x: 190,
+      title: "Нормализация структуры дела",
+      body:
+        "Файлы раскладываются по каталогам raw/, metadata/, text-layer/. " +
+        "Добавляется первичный индекс evidence.index.json и базовые метаданные по носителям.",
+      metrics: { integrity: "★★★★☆", trace: "★★★☆☆", ai: "—", risk: "●●○" }
+    },
+    {
+      id: "n2l1p0",
+      short: "T+2",
+      branch: "nlp",
+      x: 290,
+      title: "NLU-ветка: расшифровка аудио/видео",
+      body:
+        "GigaChat 3 Ultra и YandexGPT 5.1 Pro создают параллельные транскрипты. " +
+        "Каждый файл связывается с исходным артефактом через хэши и временные метки.",
+      metrics: { integrity: "★★★★☆", trace: "★★★★☆", ai: "★★★★★", risk: "●●●" }
+    },
+    {
+      id: "n2l1p1",
+      short: "T+3",
+      branch: "nlp",
+      x: 390,
+      title: "Семантический анализ и версионные гипотезы",
+      body:
+        "Модели выделяют сущности, события, роли и возможные мотивы. " +
+        "Создаются машинные гипотезы, которые в последующих коммитах будут проверяться экспертами.",
+      metrics: { integrity: "★★★☆☆", trace: "★★★★☆", ai: "★★★★★", risk: "●●●" }
+    },
+    {
+      id: "l4w0map",
+      short: "T+4",
+      branch: "legal",
+      x: 490,
+      title: "Юридическое картирование · «Нейроюрист»",
+      body:
+        "AI-модуль «Яндекс нейроюрист» сопоставляет события с нормами УК и УПК, " +
+        "формирует предварительную квалификацию и перечень процессуальных рисков.",
+      metrics: { integrity: "★★★☆☆", trace: "★★★★★", ai: "★★★★☆", risk: "●●●●" }
+    },
+    {
+      id: "l4w1rep",
+      short: "T+5",
+      branch: "legal",
+      x: 590,
+      title: "Человеческая верификация и отчёт эксперта",
+      body:
+        "Юристы и криминалисты проверяют выводы ИИ, дополняют их ссылками на протоколы и заключения " +
+        "традиционных экспертиз, фиксируя замечания и ограничения применимости.",
+      metrics: { integrity: "★★★★★", trace: "★★★★★", ai: "★★★☆☆", risk: "●●○" }
+    },
+    {
+      id: "m41n99",
+      short: "T+6",
+      branch: "evidence",
+      x: 690,
+      title: "Слияние веток и формирование процессуального снапшота",
+      body:
+        "Ветка main получает проверенные транскрипты, выводы NLU и юр.карты. " +
+        "Создаётся «freeze-коммит» для приобщения к делу как цифрового доказательства.",
+      metrics: { integrity: "★★★★★", trace: "★★★★★", ai: "★★★★☆", risk: "●●○" }
+    }
+  ];
+
+  // Линейные связи внутри веток и межветочные «мерджи»
+  const links = [
+    { from: "c0a1e0", to: "c1b2e3" },
+    { from: "c1b2e3", to: "m41n99" },
+
+    { from: "n2l1p0", to: "n2l1p1" },
+    { from: "n2l1p0", to: "c1b2e3" }, // ответвление от evidence к NLP
+    { from: "n2l1p1", to: "l4w0map" },
+
+    { from: "l4w0map", to: "l4w1rep" },
+    { from: "l4w1rep", to: "m41n99" } // merge legal → main
+  ];
+
+  // --------- ПОСТРОЕНИЕ SVG ---------
+  const svg = document.getElementById("gitGraph");
+  const NS = "http://www.w3.org/2000/svg";
+
+  function createLine(x1,y1,x2,y2,color, dashed=false) {
+    const line = document.createElementNS(NS,"line");
+    line.setAttribute("x1",x1);
+    line.setAttribute("y1",y1);
+    line.setAttribute("x2",x2);
+    line.setAttribute("y2",y2);
+    line.setAttribute("stroke",color);
+    line.setAttribute("stroke-width","2");
+    if (dashed) line.setAttribute("stroke-dasharray","4 6");
+    svg.appendChild(line);
+    return line;
+  }
+
+  function branchColor(branch) {
+    if (branch === "nlp") return "#a855f7";
+    if (branch === "legal") return "#facc15";
+    return "#38bdf8"; // evidence/main
+  }
+
+  // Ветки (тонкие направляющие линии)
+  ["evidence","nlp","legal"].forEach((b) => {
+    const y = BRANCH_Y[b];
+    createLine(70,y, 830,y, "rgba(148,163,184,0.5)", true);
+    const label = document.createElementNS(NS,"text");
+    label.setAttribute("x","30");
+    label.setAttribute("y", String(y+4));
+    label.setAttribute("fill","#6b7280");
+    label.setAttribute("font-size","10");
+    label.textContent = b;
+    svg.appendChild(label);
+  });
+
+  // Линки между коммитами
+  links.forEach(link => {
+    const from = commits.find(c => c.id === link.from);
+    const to = commits.find(c => c.id === link.to);
+    if (!from || !to) return;
+    const color = branchColor(to.branch);
+    const midY = (from.branch === to.branch)
+      ? from.y || BRANCH_Y[from.branch]
+      : (BRANCH_Y[from.branch] + BRANCH_Y[to.branch]) / 2;
+
+    const path = document.createElementNS(NS,"path");
+    const d = `M ${from.x} ${BRANCH_Y[from.branch]}
+               Q ${(from.x+to.x)/2} ${midY}
+               ${to.x} ${BRANCH_Y[to.branch]}`;
+    path.setAttribute("d", d);
+    path.setAttribute("fill","none");
+    path.setAttribute("stroke", color);
+    path.setAttribute("stroke-width","2");
+    path.setAttribute("stroke-linecap","round");
+    svg.appendChild(path);
+  });
+
+  // Коммиты
+  commits.forEach(commit => {
+    const y = BRANCH_Y[commit.branch];
+
+    const outer = document.createElementNS(NS,"circle");
+    outer.setAttribute("cx", commit.x);
+    outer.setAttribute("cy", y);
+    outer.setAttribute("r", "9");
+    outer.setAttribute("fill", "rgba(15,23,42,0.95)");
+    outer.setAttribute("stroke", branchColor(commit.branch));
+    outer.setAttribute("stroke-width", "2");
+    outer.setAttribute("opacity","0.9");
+    outer.classList.add("commit-node-outline");
+    svg.appendChild(outer);
+
+    const inner = document.createElementNS(NS,"circle");
+    inner.setAttribute("cx", commit.x);
+    inner.setAttribute("cy", y);
+    inner.setAttribute("r", "4.5");
+    inner.setAttribute("fill", branchColor(commit.branch));
+    inner.setAttribute("data-id", commit.id);
+    inner.style.cursor = "pointer";
+    svg.appendChild(inner);
+
+    const label = document.createElementNS(NS,"text");
+    label.setAttribute("x", commit.x);
+    label.setAttribute("y", y - 16);
+    label.setAttribute("fill", "#9ca3af");
+    label.setAttribute("font-size","10");
+    label.setAttribute("text-anchor","middle");
+    label.textContent = commit.short;
+    svg.appendChild(label);
+  });
+
+  // --------- UI ПРАВОЙ ПАНЕЛИ ---------
+  const commitIdEl = document.getElementById("commitId");
+  const commitTitleEl = document.getElementById("commitTitle");
+  const commitBranchEl = document.getElementById("commitBranch");
+  const commitBodyEl = document.getElementById("commitBody");
+  const pillIntegrityEl = document.getElementById("pillIntegrity");
+  const pillTraceEl = document.getElementById("pillTrace");
+  const pillAIEl = document.getElementById("pillAI");
+  const pillRiskEl = document.getElementById("pillRisk");
+
+  function selectCommit(id) {
+    const c = commits.find(item => item.id === id);
+    if (!c) return;
+
+    commitIdEl.textContent = "commit " + c.id;
+    commitTitleEl.textContent = c.title;
+    commitBranchEl.textContent = "ветка: " + c.branch;
+    commitBodyEl.textContent = c.body;
+    pillIntegrityEl.textContent = c.metrics.integrity;
+    pillTraceEl.textContent = c.metrics.trace;
+    pillAIEl.textContent = c.metrics.ai;
+    pillRiskEl.textContent = c.metrics.risk;
+
+    document.querySelectorAll(".commit-node-outline").forEach(node => {
+      node.setAttribute("stroke-opacity","0.35");
+      node.setAttribute("stroke-width","2");
+    });
+    const outline = Array.from(document.querySelectorAll(".commit-node-outline"))
+      .find(o => {
+        const cx = o.getAttribute("cx");
+        const cy = o.getAttribute("cy");
+        const maybe = commits.find(cm => cm.id === id);
+        if (!maybe) return false;
+        return cx == maybe.x && cy == BRANCH_Y[maybe.branch];
+      });
+    if (outline) {
+      outline.setAttribute("stroke-opacity","1");
+      outline.setAttribute("stroke-width","3");
+    }
+  }
+
+  // Навешиваем клики
+  svg.addEventListener("click", (evt) => {
+    const t = evt.target;
+    const id = t.getAttribute("data-id");
+    if (id) selectCommit(id);
+  });
+
+  // Выбираем первый коммит по умолчанию
+  selectCommit(commits[0].id);
+</script>
+</body>
+</html>
